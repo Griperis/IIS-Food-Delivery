@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'FoodDelivery.apps.FooddeliveryConfig',
     'django.contrib.admin',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
@@ -75,6 +76,7 @@ WSGI_APPLICATION = 'FoodDeliveryProject.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+# Heroku automaticly converts this setting and uses postgreSql
 
 DATABASES = {
     'default': {
