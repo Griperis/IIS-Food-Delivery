@@ -9,6 +9,28 @@
 <body>
     <h1>Test index page</h1>
     <p>Deployment test paragraph</p>
+
+    {% if user.is_authenticated %}
+        <li>User: {{ user.get_username }}</li> 
+        <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>   
+    {% else %}
+        Nepřihlášený uživatel  
+        <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>  
+    {% endif %} 
+
+
+    <h1>Seznam hospod:</h1>
+        {% for facility in facilities %}
+                <p>{{ facility.name }}</p>
+                <p>{{ facility.address }}</p>
+                <p>{{ facility.state }}</p>
+                <p>{{ facility.opening_time}}</p>
+                <p>{{ facility.closing_time}}</p>
+                <br>
+        {% endfor %}
+
+
+
     {% comment %} Bootstrap 4.0 scripts {% endcomment %}
     <script src="https://kit.fontawesome.com/c54d362b32.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
