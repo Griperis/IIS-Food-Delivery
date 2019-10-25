@@ -4,8 +4,11 @@ from django.db import models
 class Item(models.Model):
     name = models.CharField(max_length=100)
     variant = models.CharField(max_length=200)
-    img = models.ImageField(null=True)
+    img = models.ImageField(null=True, blank = True)
     prize = models.IntegerField()
+
+    def __str__(self):
+        return self.name
 
 
 class Drink(Item):
@@ -35,12 +38,15 @@ class Order(models.Model):
         ('F', 'FINISHED'),
     )
     items = models.ManyToManyField(to=Item)
-    state = models.CharField(max_length=100, choices=ORDER_STATE)
+    state = models.CharField(max_length=100, choices=ORDER_STATE, default = ORDER_STATE[0])
     date = models.DateTimeField(auto_now=True)
     prize = models.IntegerField()
     belongs_to = models.ForeignKey(to='FoodDelivery.Facility', on_delete=models.CASCADE)
     created_by = models.ForeignKey(CustomUser, related_name = 'CreatedBy', on_delete = models.SET_NULL, null = True, blank = True)
     handled_by = models.ForeignKey(CustomUser, on_delete = models.SET_NULL, null = True, blank = True)
+
+    def __str__(self):
+        return "Order: " + str(self.pk)
 
 
 class Offer(models.Model):
@@ -49,10 +55,11 @@ class Offer(models.Model):
         ('P', 'PERMANENT_OFFER')
     )
     variant = models.CharField(max_length=20, choices=OFFER_VARIANT) 
-    items = models.ManyToManyField(Item)
+    items = models.ManyToManyField(Item, blank = True)
+    # TODO: add name or something
     
     def __str__(self):
-        return 'pk: ' + self.pk + ' variant: ' + self.variant    
+        return 'pk: ' + str(self.pk) + ' variant: ' + str(self.variant)
 
 
 class Facility(models.Model):
@@ -66,7 +73,7 @@ class Facility(models.Model):
     opening_time = models.TimeField(name='opening_time')
     closing_time = models.TimeField(name='closing_time')
     state = models.CharField(max_length=20, choices=FACILITY_STATE)
-    offers = models.ManyToManyField(to=Offer)
+    offers = models.ManyToManyField(to=Offer, blank = True)
     
     def __str__(self):
         return self.name
