@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class Item(models.Model):
@@ -61,4 +62,6 @@ class Facility(models.Model):
         return self.name
     
 
-# User models (TODO)
+class CustomUser(AbstractUser):
+    ...
+
