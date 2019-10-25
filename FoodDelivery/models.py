@@ -17,6 +17,17 @@ class Food(Item):
     ingredients = models.CharField(max_length=300)
 
 
+class CustomUser(AbstractUser):
+    phone = models.CharField(max_length = 50, null = True, blank = True)
+    address = models.CharField(max_length=200, null = True, blank = True)
+
+    def get_phone(self):
+        return self.phone
+
+    def get_address(self):
+        return self.address
+
+
 class Order(models.Model):
     ORDER_STATE = (
         ('A', 'ACCEPTED'),
@@ -28,9 +39,8 @@ class Order(models.Model):
     date = models.DateTimeField(auto_now=True)
     prize = models.IntegerField()
     belongs_to = models.ForeignKey(to='FoodDelivery.Facility', on_delete=models.CASCADE)
-
-
-
+    created_by = models.ForeignKey(CustomUser, related_name = 'CreatedBy', on_delete = models.SET_NULL, null = True, blank = True)
+    handled_by = models.ForeignKey(CustomUser, on_delete = models.SET_NULL, null = True, blank = True)
 
 
 class Offer(models.Model):
@@ -60,8 +70,3 @@ class Facility(models.Model):
     
     def __str__(self):
         return self.name
-    
-
-class CustomUser(AbstractUser):
-    ...
-
