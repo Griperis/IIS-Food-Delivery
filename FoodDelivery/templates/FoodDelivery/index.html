@@ -1,3 +1,4 @@
+{% load auth_extras %}
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -11,13 +12,26 @@
     <p>Deployment test paragraph</p>
 
     {% if user.is_authenticated %}
-        <li>User: {{ user.get_username }}</li> 
-        <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>   
-    {% else %}
-        Nepřihlášený uživatel  
-        <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>  
-    {% endif %} 
+        <p class="m-0">{{ user.get_username }}</p>
 
+    {% if request.user|has_group:"Operator" %}
+        <p>User belongs to my group
+    {% else %}
+        <p>User doesn't belong to mygroup</p>
+    {% endif %}
+
+    <div class="dropdown">
+        <a class="dropdown-toggle text-reset" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Profil</a>
+
+        <div class="dropdown-menu dropdown-menu-right" data-display="static" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Odhlásit se</a>
+        </div>
+    </div>
+
+    {% else %}
+            <a class="text-reset m-0" href="{% url 'login'%}?next={{request.path}}">Přihlásit se</a>
+            <a class="text-reset m-0" href="{% url 'register'%}?next={{request.path}}">Zaregistrovat se</a>
+    {% endif %}
 
     <h1>Seznam hospod:</h1>
         {% for facility in facilities %}
@@ -28,8 +42,6 @@
                 <p>{{ facility.closing_time}}</p>
                 <br>
         {% endfor %}
-
-
 
     {% comment %} Bootstrap 4.0 scripts {% endcomment %}
     <script src="https://kit.fontawesome.com/c54d362b32.js" crossorigin="anonymous"></script>
