@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink
-from .forms import CustomUserCreationForm ,FacilityForm
+from .forms import CustomUserCreationForm
 
 def index(request):
 
