@@ -25,13 +25,12 @@
 
         <div class="dropdown-menu dropdown-menu-right" data-display="static" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Odhlásit se</a>
-            <a class="dropdown-item" href="{% url 'formtest'%}">Test</a>
         </div>
     </div>
 
     {% else %}
             <a class="text-reset m-0" href="{% url 'login'%}?next={{request.path}}">Přihlásit se</a>
-            <a class="text-reset m-0" href="#">Zaregistrovat se</a>
+            <a class="text-reset m-0" href="{% url 'register'%}?next={{request.path}}">Zaregistrovat se</a>
     {% endif %}
 
     <h1>Seznam hospod:</h1>
