@@ -1,0 +1,8 @@
+{% extends 'app/base.html'%}
+
+{% block content %}
+    <h1>Seznam hospod:</h1>
+    {% for facility in facilities %}
+        {% include 'app/facility/facility_list_view.html'%}
+    {% endfor %}
+{% endblock %}

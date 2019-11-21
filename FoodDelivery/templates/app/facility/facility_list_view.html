@@ -1,0 +1,10 @@
+{% block facility_list_view %}
+<div style="border: solid 1px red; padding: 10px;">
+    <p>{{ facility.name }}</p>
+    <p>{{ facility.address }}</p>
+    <p>{{ facility.state }}</p>
+    <p>{{ facility.opening_time}}</p>
+    <p>{{ facility.closing_time}}</p>
+    <a href="{% url  'facility_detail' facility.id %}">Vybrat</a>
+</div>
+{% endblock %}
