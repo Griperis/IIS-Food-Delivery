@@ -8,7 +8,7 @@ urlpatterns = [
 ]
 
 
-#Add Django site authentication urls (for login, logout, password management)
+#Add Django site authentication urls (for login, logout, registration)
 urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register', views.register, name="register"),
