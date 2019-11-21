@@ -14,7 +14,7 @@ def user_profile(request):
 
 def facility_detail(request, facility_id):
     facility = get_object_or_404(Facility, pk=facility_id)
-    return render(request, 'app/facility_detail.html', {'facility': facility})
+    return render(request, 'app/facility/facility_detail.html', {'facility': facility})
 
 def operator(request):
     return render(request, 'app/operator.html')
