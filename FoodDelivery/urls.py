@@ -5,6 +5,12 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('user/', views.user_profile, name='user_profile'),
+    path('facility/<int:facility_id>', views.facility_detail, name='facility_detail'),
+
+    path('driver/', views.driver, name='driver'),
+    path('operator/', views.operator, name='operator'),
+    path('custom_admin/', views.admin, name='custom_admin')
 ]
 
 
