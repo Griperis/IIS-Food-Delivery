@@ -1,6 +1,32 @@
 {% extends 'app/base.html '%}
 
 {% block content %}
+
 <h3>Skvely Profil</h3>
 <p>Username: {{ user.username }}
+<br>
+<form action="{% url 'edit_user' %}" method="post">
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    <input type="submit" name = "user" value="Submit">
+</form>
+<br><br><br>
+
+Password change!
+<form action="{% url 'change_password' %}" method="post">
+    {% csrf_token %}
+    {{ password_form.as_p }}
+    <input type="submit" name="password" value="Change Password">
+</form>
+<br><br>
+
+{% for order in orders %}
+        <p>{{ order.state }}</p>
+        <p>{{ order.prize }}</p>
+        <p>{{ order.pk }}</p>
+        <br>
+{% endfor %}
+
+
+
 {% endblock %}
