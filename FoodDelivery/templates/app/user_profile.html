@@ -1,9 +1,14 @@
 {% extends 'app/base.html '%}
 
 {% block content %}
-
 <h3>Skvely Profil</h3>
 <p>Username: {{ user.username }}
+<br>
+
+{% if success %}
+    <p>Hodnoty úspěšně změněny!
+{% endif %}
+
 <br>
 <form action="{% url 'edit_user' %}" method="post">
     {% csrf_token %}
@@ -20,13 +25,8 @@ Password change!
 </form>
 <br><br>
 
-{% for order in orders %}
-        <p>{{ order.state }}</p>
-        <p>{{ order.prize }}</p>
-        <p>{{ order.pk }}</p>
-        <br>
-{% endfor %}
-
-
+{% include 'app/order_list.html'%}
 
 {% endblock %}
+
+

@@ -11,41 +11,19 @@ def index(request):
 
     return render(request, 'app/index.html', {"facilities":facilities})
 
-def user_profile_old(request):
-    user = request.user
-    orders = Order.objects.all().filter(created_by = user)
-
-    if request.method == 'POST':
-        form = CustomUserChangeForm(request.POST, instance=request.user)
-        password_form = PasswordChangeForm(request.POST, instance=request.user)
-
-        if form.is_valid():
-            #user.username = form.cleaned_data.get('username')
-            user.email = form.cleaned_data.get('email')
-            user.first_name = form.cleaned_data.get('first_name')
-            user.last_name = form.cleaned_data.get('last_name')
-            user.address = form.cleaned_data.get('address')
-            user.phone = form.cleaned_data.get('phone')
-            user.save()
-            #TODO: vypsat že se to uložilo 
-            #TODO: udelat username políčko aby nešlo editovat
-
-    else:
-        form = CustomUserChangeForm(initial={ 'username' : user.username, 'email' : user.email, 'first_name' : user.first_name, 'last_name' : user.last_name, 'address' : user.address, 'phone' : user.phone})
-        password_form = PasswordChangeForm(user = user)
-
-    #TODO: add password changing.
-    return render(request, 'app/user_profile.html', {'orders' : orders, 'form' : form, 'password_form' : password_form})
-
 def user_profile(request):
     user = request.user
     orders = Order.objects.all().filter(created_by = user)
+    success = False
+
 
     if request.method == 'GET':
+        success = "true" == request.GET.get("success",'')
+        
         user_form = CustomUserChangeForm(initial={ 'username' : user.username, 'email' : user.email, 'first_name' : user.first_name, 'last_name' : user.last_name, 'address' : user.address, 'phone' : user.phone})
         password_form = PasswordChangeForm(user = user)
 
-    return render(request, 'app/user_profile.html', {'orders' : orders, 'user_form' : user_form, 'password_form' : password_form})
+    return render(request, 'app/user_profile.html', {'orders' : orders, 'user_form' : user_form, 'password_form' : password_form, 'success' : success})
 
 def edit_user(request):
     user = request.user
@@ -62,7 +40,7 @@ def edit_user(request):
             user.save()
             #TODO: vypsat že se to uložilo 
             #TODO: udelat username políčko aby nešlo editovat
-        return redirect(to='/user')
+        return redirect(to='/user?success=true')
 
 def change_password(request):
     user = request.user

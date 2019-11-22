@@ -1,0 +1,9 @@
+{% block order_list %}
+    ORDERS!!!!
+    {% for order in orders %}
+            <p>{{ order.state }}</p>
+            <p>{{ order.prize }}</p>
+            <p>{{ order.pk }}</p>
+            <br>
+    {% endfor %}
+{% endblock %}
