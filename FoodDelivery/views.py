@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink
+from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
 from .forms import CustomUserCreationForm
 
 def index(request):
@@ -13,8 +13,36 @@ def user_profile(request):
 
 
 def facility_detail(request, facility_id):
-    facility = get_object_or_404(Facility, pk=facility_id)
-    return render(request, 'app/facility/facility_detail.html', {'facility': facility})
+    if request.method == 'POST':
+        form_values = request.POST.dict().items()
+        item_count = {}
+        total_price = 0
+        for input_name, value in form_values:
+            if input_name == 'csrfmiddlewaretoken' or value == 0:
+                continue
+            offer, item_id = input_name.split(';')
+            if item_id in item_count:
+                item_count[item_id] += value
+            else:
+                item_count[item_id] = value
+
+        facility = Facility.objects.get(pk=facility_id)
+        new_order = Order(state=Order.ORDER_STATE[0], price=total_price, belongs_to=facility, created_by=request.user)
+        new_order.save()
+        
+        items = []
+        for item_id, count in item_count.items():
+            item = Item.objects.get(pk=item_id)
+            new_oi = OrderItem(item=item, order=new_order, count=count)
+            new_oi.save()
+            items.append(item)
+
+        new_order.items.add(*items)
+
+        return redirect(to='user_profile')
+    else:
+        facility = get_object_or_404(Facility, pk=facility_id)
+        return render(request, 'app/facility/facility_detail.html', {'facility': facility})
 
 def operator(request):
     return render(request, 'app/operator.html')
