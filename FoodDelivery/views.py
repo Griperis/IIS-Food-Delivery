@@ -31,16 +31,15 @@ def edit_user(request):
     if request.method == 'POST':
         user_form = CustomUserChangeForm(request.POST, instance=request.user)
         if user_form.is_valid():
-            #user.username = form.cleaned_data.get('username')
             user.email = user_form.cleaned_data.get('email')
             user.first_name = user_form.cleaned_data.get('first_name')
             user.last_name = user_form.cleaned_data.get('last_name')
             user.address = user_form.cleaned_data.get('address')
             user.phone = user_form.cleaned_data.get('phone')
+            #TODO: kontrolovat formát tel. čísla
             user.save()
-            #TODO: vypsat že se to uložilo 
-            #TODO: udelat username políčko aby nešlo editovat
-        return redirect(to='/user?success=true')
+            return redirect(to='/user?success=true')
+        #TODO: mozna dalši return?
 
 def change_password(request):
     user = request.user
@@ -78,6 +77,7 @@ def register(request):
             new_last_name = form.cleaned_data.get('last_name')
             new_address = form.cleaned_data.get('address')
             new_phone = form.cleaned_data.get('phone')
+            #TODO: kontrolovat formát tel. čísla
             new_password = form.cleaned_data.get('password1')
 
             new_user = CustomUser(username = new_username, email = new_email, first_name = new_first_name, last_name = new_last_name, address = new_address, phone = new_phone, password = new_password)

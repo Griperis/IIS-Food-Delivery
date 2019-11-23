@@ -1,32 +1,44 @@
 {% extends 'app/base.html '%}
 
 {% block content %}
-<h3>Skvely Profil</h3>
-<p>Username: {{ user.username }}
-<br>
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a class="nav-item nav-link active" id="nav-orders-tab" data-toggle="tab" href="#nav-orders" role="tab" aria-controls="nav-orders" aria-selected="true">Objednávky</a>
+    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Profil</a>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-orders" role="tabpanel" aria-labelledby="nav-orders-tab">
+    {% for order in orders %}
+        {% include 'app/order_list.html'%}
+    {% endfor %}
+  </div>
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+    <h3>Skvely Profil</h3>
+    <p>Username: {{ user.username }}
+    <br>
 
-{% if success %}
-    <p>Hodnoty úspěšně změněny!
-{% endif %}
+    {% if success %}
+        <p>Hodnoty úspěšně změněny!
+    {% endif %}
 
-<br>
-<form action="{% url 'edit_user' %}" method="post">
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    <input type="submit" name = "user" value="Submit">
-</form>
-<br><br><br>
+    <br>
+    <form action="{% url 'edit_user' %}" method="post">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        <input type="submit" name = "user" value="Submit">
+    </form>
+    <br><br><br>
 
-Password change!
-<form action="{% url 'change_password' %}" method="post">
-    {% csrf_token %}
-    {{ password_form.as_p }}
-    <input type="submit" name="password" value="Change Password">
-</form>
-<br><br>
+    Password change!
+    <form action="{% url 'change_password' %}" method="post">
+        {% csrf_token %}
+        {{ password_form.as_p }}
+        <input type="submit" name="password" value="Change Password">
+    </form>
+  </div>
+</div>
+<br><br><br><br>
 
-{% include 'app/order_list.html'%}
 
 {% endblock %}
-
-
