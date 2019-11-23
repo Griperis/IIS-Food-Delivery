@@ -26,24 +26,25 @@ def add_order_item(request, item_id, facility_id):
                 loaded_state[facility_id][item_id] = 1
             return parse_order_state(loaded_state[facility_id])
         else:
-            return {}
+            return {'order': {}, 'prize': 0}
 
 def remove_order_item(request, item_id, facility_id):
     order_state = request.COOKIES.get('order_state')
     if order_state is None:
-        return False
+        return {'order': {}, 'prize': 0}
     else:
         loaded_state = json.loads(order_state)
         if facility_id in loaded_state and item_id in loaded_state[facility_id]:
             loaded_state[facility_id][item_id] -= 1
             if loaded_state[facility_id][item_id] == 0:
                 del loaded_state[facility_id][item_id]
+        
         return parse_order_state(loaded_state[facility_id])
 
 def load_order_state(request, facility_id):
     order_state = request.COOKIES.get('order_state')
     if order_state is None:
-        return {}
+        return {'order': {}, 'prize': 0}
     else:
         item_count = json.loads(order_state)
         return parse_order_state(item_count[facility_id])

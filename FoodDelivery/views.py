@@ -35,19 +35,22 @@ def facility_detail(request, facility_id):
         return response
     else:
         facility = get_object_or_404(Facility, pk=facility_id)
-        context = {'facility': facility, 'summary': load_order_state(request, str(facility_id))}
+        context = {'facility': facility, 'can_order': True, 'summary': {}}
+        order_summary = load_order_state(request, str(facility_id))
         
         if request.GET.get('add_item'):
             added_item_id = request.GET['add_item']
-            context['summary'] = add_order_item(request, added_item_id, str(facility_id))
+            order_summary = add_order_item(request, added_item_id, str(facility_id))
         elif request.GET.get('remove_item'):
             removed_item_id = request.GET['remove_item']
-            context['summary'] = remove_order_item(request, removed_item_id, str(facility_id))
-        
+            order_summary = remove_order_item(request, removed_item_id, str(facility_id))
+        if len(order_summary['order']) == 0:
+            context['can_order'] = False
+        context['summary'] = order_summary
         response = render(request, 'app/facility/facility_detail.html', context)
         
-        if (context['summary']):
-            save_order_state(response, context['summary']['order'], str(facility_id))
+        if (order_summary):
+            save_order_state(response, order_summary['order'], str(facility_id))
         return response
 
 def order_summary(request, order_id):

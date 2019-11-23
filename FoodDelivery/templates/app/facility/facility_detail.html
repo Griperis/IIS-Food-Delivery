@@ -1,7 +1,6 @@
 {% extends 'app/base.html'%}
 
 {% block content %}
-{% if summary %}
 <div class="fd-summary-container rounded shadow-lg">
     <h3>Shrnutí objednávky</h3>
     {% for entry in summary.order %}
@@ -13,10 +12,9 @@
     <p>Cena celkem: {{ summary.price }} Kč</p>
     <form method="POST">
         {% csrf_token %}
-        <button type="submit" class="btn btn-warning btn-block">Objednat</button>
+        <button type="submit" class="btn btn-warning btn-block" {% if not can_order %} disabled {% endif %}>Objednat</button>
     </form>
 </div>
-{% endif %}
 <h2>Restaurace: {{ facility.name }}</h2>
 <p>Adresa: {{ facility.address }}</p>
 <p>Otevřeno: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
