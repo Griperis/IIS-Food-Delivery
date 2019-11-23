@@ -35,11 +35,11 @@ class Order(models.Model):
     ORDER_STATE = (
         ('A', 'ACCEPTED'),
         ('D', 'DELIVERING'),
-        ('F', 'FINISHED'),
+        ('F', 'FINISHED')
     )
     items = models.ManyToManyField(to=Item, through='OrderItem', through_fields=('order', 'item'))
     state = models.CharField(max_length=100, choices=ORDER_STATE, default=ORDER_STATE[0])
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now=True, editable=False)
     price = models.IntegerField()
     belongs_to = models.ForeignKey(to='FoodDelivery.Facility', on_delete=models.CASCADE)
     created_by = models.ForeignKey(CustomUser, related_name='CreatedBy', on_delete=models.SET_NULL, null=True, blank=True)

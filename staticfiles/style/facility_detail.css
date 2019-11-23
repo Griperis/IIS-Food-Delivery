@@ -1,0 +1,11 @@
+.fd-summary-container {
+    float: right;
+    position: sticky;
+    min-height: 400px;
+    z-index: 1;
+    top: 20%;
+    background: #292826;
+    color: white;
+    padding: 10px;
+    display: inline-block;
+}

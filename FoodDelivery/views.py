@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, loader, HttpResponseRedirect
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
 from .forms import CustomUserCreationForm
+from .cookies import *
 
 def index(request):
 
@@ -12,37 +13,46 @@ def user_profile(request):
     return render(request, 'app/user_profile.html')
 
 
+def create_new_order(order_state, facility_id, user):
+    facility = get_object_or_404(Facility, pk=facility_id)
+    order_items = order_state['order']
+    price = order_state['price']
+    new_order = Order(state='A', price=price, belongs_to=facility)
+    if user.is_authenticated:
+        new_order.created_by = user
+    new_order.save()
+    for entry in order_items:
+        oi = OrderItem(item=entry['item'], order=new_order, count=entry['count'])
+        oi.save()
+        new_order.items.add(entry['item'])
+
 def facility_detail(request, facility_id):
     if request.method == 'POST':
-        form_values = request.POST.dict().items()
-        item_count = {}
-        total_price = 0
-        for input_name, value in form_values:
-            if input_name == 'csrfmiddlewaretoken' or value == 0:
-                continue
-            offer, item_id = input_name.split(';')
-            if item_id in item_count:
-                item_count[item_id] += value
-            else:
-                item_count[item_id] = value
-
-        facility = Facility.objects.get(pk=facility_id)
-        new_order = Order(state=Order.ORDER_STATE[0], price=total_price, belongs_to=facility, created_by=request.user)
-        new_order.save()
-        
-        items = []
-        for item_id, count in item_count.items():
-            item = Item.objects.get(pk=item_id)
-            new_oi = OrderItem(item=item, order=new_order, count=count)
-            new_oi.save()
-            items.append(item)
-
-        new_order.items.add(*items)
-
-        return redirect(to='user_profile')
+        order_state = load_order_state(request, str(facility_id))
+        create_new_order(order_state, facility_id, request.user)
+        response = redirect('user_profile')
+        remove_order_cookies(response)
+        return response
     else:
         facility = get_object_or_404(Facility, pk=facility_id)
-        return render(request, 'app/facility/facility_detail.html', {'facility': facility})
+        context = {'facility': facility, 'summary': load_order_state(request, str(facility_id))}
+        
+        if request.GET.get('add_item'):
+            added_item_id = request.GET['add_item']
+            context['summary'] = add_order_item(request, added_item_id, str(facility_id))
+        elif request.GET.get('remove_item'):
+            removed_item_id = request.GET['remove_item']
+            context['summary'] = remove_order_item(request, removed_item_id, str(facility_id))
+        
+        response = render(request, 'app/facility/facility_detail.html', context)
+        
+        if (context['summary']):
+            save_order_state(response, context['summary']['order'], str(facility_id))
+        return response
+
+def order_summary(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+    return render(request, 'app/order/order_summary.html', {'order': order })
 
 def operator(request):
     return render(request, 'app/operator.html')

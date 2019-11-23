@@ -1,39 +1,48 @@
 {% extends 'app/base.html'%}
 
 {% block content %}
-    <div class="container">
-        <h2>Restaurace: {{ facility.name }}</h2>
-        <p>Adresa: {{ facility.address }}</p>
-        <p>Otevreno: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
-        <p>{{ facility.state }}</p>
-        <form method="POST">
-            {% csrf_token %}
+{% if summary %}
+<div class="fd-summary-container rounded shadow-lg">
+    <h3>Shrnutí objednávky</h3>
+    {% for entry in summary.order %}
+        {{ entry.count }}x {{ entry.item.name }}
+        <form method="GET">
+            <button type="submit" class="btn btn-warning" name="remove_item" value="{{ entry.item.pk }}">Odebrat</button>
+        </form>
+    {% endfor %}
+    <p>Cena celkem: {{ summary.price }} Kč</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning btn-block">Objednat</button>
+    </form>
+</div>
+{% endif %}
+<h2>Restaurace: {{ facility.name }}</h2>
+<p>Adresa: {{ facility.address }}</p>
+<p>Otevřeno: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
+<p>{{ facility.state }}</p>
+<div class="mb-3">
+    <ul class="list-group">
+        {% for offer in facility.offers.all %}
+        <h3>Nabidka {{ forloop.counter0 }}: {{ offer.name }}, Typ: {{ offer.variant }}</h3>
+        <li class="list-group-item">
             <ul class="list-group">
-                {% for offer in facility.offers.all %}
-                    <h3>Nabidka {{ forloop.counter0 }}: {{ offer.name }}, Typ:  {{ offer.variant }}</h3>
-                    <li class="list-group-item">
-                        <ul class="list-group">
-                            {% for item in offer.items.all %}
-                                <li class="list-group-item">
-                                    {% comment %} Image with no image available picture when item.img is not set {% endcomment %}
-                                    <img style="width: 200px;" 
-                                        src="{% if item.img %}{{ item.img.url }}{% endif %}" 
-                                        onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'"
-                                    >
-                                    <h4>{{ item.name }}</h4>
-                                    <p>Typ: {{ item.variant }}</p>
-                                    <p>Cena: {{ item.price }} Kč</p>
-                                    <label>
-                                        Množství:
-                                        <input type="number" name="{{ offer.pk }};{{ item.pk }}"min="0" value="0">
-                                    </label>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
+                {% for item in offer.items.all %}
+                <li class="list-group-item">
+                    {% comment %} Image with no image available picture when item.img is not set {% endcomment %}
+                    <img style="width: 200px;" src="{% if item.img %}{{ item.img.url }}{% endif %}"
+                        onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'">
+                    <h4>{{ item.name }}</h4>
+                    <p>Typ: {{ item.variant }}</p>
+                    <p>Cena: {{ item.price }} Kč</p>
+                    <form method="GET" action="">
+                        <button type="submit" class="btn btn-warning" name="add_item" value="{{ item.pk }}">Přidat</button>
+                    </form>
+                </li>
                 {% endfor %}
             </ul>
-            <button type="submit">Order</button>
-        </form>
-    </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
