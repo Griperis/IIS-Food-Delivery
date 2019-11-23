@@ -1,11 +1,20 @@
 .fd-summary-container {
-    float: right;
     position: sticky;
     min-height: 400px;
     z-index: 1;
     top: 20%;
+    float: right;
     background: #292826;
     color: white;
     padding: 10px;
-    display: inline-block;
+}
+.fd-offer-container {
+    margin-top: 30px;
+}
+.online-symbol {
+    color: #7CFC00;
+}
+
+.offline-symbol {
+    color: red;
 }
