@@ -13,7 +13,7 @@
         {% if user.is_authenticated %}
             <p class="m-0">Username {{ user.get_username }}</p>
             <a href="{% url 'user_profile' %}">Profil</a>
-            <a href="{% url 'logout'%}?next={{request.path}}">Odhlásit se</a>
+            <a href="{% url 'logout'%}">Odhlásit se</a>
                 {% if user|has_group:"Driver" %}
                     <a href="{% url 'driver' %}">Řidič</a>
                 {% endif %}
@@ -26,8 +26,8 @@
 
 
         {% else %}
-                <a class="text-reset m-0" href="{% url 'login'%}?next={{request.path}}">Přihlásit se</a>
-                <a class="text-reset m-0" href="{% url 'register'%}?next={{request.path}}">Zaregistrovat se</a>
+                <a class="text-reset m-0" href="{% url 'login'%}">Přihlásit se</a>
+                <a class="text-reset m-0" href="{% url 'register'%}">Zaregistrovat se</a>
         {% endif %}
     </div>
     {% block content %}
