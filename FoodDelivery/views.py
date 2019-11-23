@@ -109,7 +109,8 @@ def register(request):
             #TODO: kontrolovat formát tel. čísla
             new_password = form.cleaned_data.get('password1')
 
-            new_user = CustomUser(username = new_username, email = new_email, first_name = new_first_name, last_name = new_last_name, address = new_address, phone = new_phone, password = new_password)
+            new_user = CustomUser(username = new_username, email = new_email, first_name = new_first_name, last_name = new_last_name, address = new_address, phone = new_phone)
+            new_user.set_password(new_password)
             new_user.save()
             
             return redirect(to = 'login')
