@@ -15,8 +15,14 @@ def index(request):
 def user_profile(request):
     user = request.user
     orders = Order.objects.all().filter(created_by = user)
-    success = False
+    orders_with_data = []
 
+    for order in orders:
+        items = OrderItem.objects.all().filter(order = order)
+        order_data = {"order" : order, "items" : items}
+        orders_with_data.append(order_data)
+
+    success = False
 
     if request.method == 'GET':
         success = "true" == request.GET.get("success",'')
@@ -24,7 +30,7 @@ def user_profile(request):
         user_form = CustomUserChangeForm(initial={ 'username' : user.username, 'email' : user.email, 'first_name' : user.first_name, 'last_name' : user.last_name, 'address' : user.address, 'phone' : user.phone})
         password_form = PasswordChangeForm(user = user)
 
-    return render(request, 'app/user_profile.html', {'orders' : orders, 'user_form' : user_form, 'password_form' : password_form, 'success' : success})
+    return render(request, 'app/user_profile.html', {'orders_with_data' : orders_with_data, 'user_form' : user_form, 'password_form' : password_form, 'success' : success})
 
 def edit_user(request):
     user = request.user
