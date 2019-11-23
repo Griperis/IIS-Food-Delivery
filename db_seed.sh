@@ -1,3 +1,6 @@
+python manage.py makemigrations FoodDelivery;
+python manage.py migrate FoodDelivery;
+python manage.py makemigrations;
 python manage.py migrate;
 echo "
 from FoodDelivery.models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem

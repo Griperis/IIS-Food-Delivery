@@ -6,6 +6,7 @@ class Item(models.Model):
     variant = models.CharField(max_length=200, blank=True)
     img = models.ImageField(null=True, blank=True)
     price = models.IntegerField()
+    in_stock = models.BooleanField()
 
     def __str__(self):
         return self.name
