@@ -1,0 +1,26 @@
+{% block info_edit %}
+    
+    <div class="pt-2">
+        <h3>Změna osobních údajů</h3>
+        <form action="{% url 'edit_user' %}" method="post">
+            {% csrf_token %}
+            <p>
+                <label for="disabledInput">Uživatelské jméno:</label>
+                <input class="form-control" id="disabledInput" type="text" placeholder="{{ user.username }}" disabled>
+            </p>
+            {{ user_form.as_p }}
+            <input type="submit" class="btn btn-primary mb-2" value="Potvrdit změny">
+        </form>
+        {% if success %}
+            <p class="font-weight-bold text-success">Hodnoty úspěšně změněny!</p>
+        {% endif %}
+    </div>
+
+
+    <h3>Změna hesla</h3>
+    <form action="{% url 'change_password' %}" method="post">
+        {% csrf_token %}
+        {{ password_form.as_p }}
+        <input type="submit" name="password" class="btn btn-primary mb-2" value="Změnit heslo">
+    </form>
+{% endblock %}

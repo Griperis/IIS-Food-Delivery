@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
-from .forms import CustomUserCreationForm, CustomUserChangeForm
-from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 
 
@@ -28,7 +28,7 @@ def user_profile(request):
         success = "true" == request.GET.get("success",'')
         
         user_form = CustomUserChangeForm(initial={ 'username' : user.username, 'email' : user.email, 'first_name' : user.first_name, 'last_name' : user.last_name, 'address' : user.address, 'phone' : user.phone})
-        password_form = PasswordChangeForm(user = user)
+        password_form = CustomPasswordChangeForm(user = user)
 
     return render(request, 'app/user_profile.html', {'orders_with_data' : orders_with_data, 'user_form' : user_form, 'password_form' : password_form, 'success' : success})
 
@@ -52,7 +52,7 @@ def change_password(request):
     user = request.user
     #TODO: handle not registered user
     if request.method == 'POST':
-        password_form = PasswordChangeForm(data=request.POST, user = user)
+        password_form = CustomPasswordChangeForm(data=request.POST, user = user)
         if password_form.is_valid():
             new_password = password_form.cleaned_data.get('new_password1')
             user.set_password(new_password)
