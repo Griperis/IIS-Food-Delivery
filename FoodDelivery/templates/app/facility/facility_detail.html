@@ -1,7 +1,29 @@
 {% extends 'app/base.html'%}
 
 {% block content %}
-    <div>
-        Facility: {{ facility.name }}
+    <div class="container">
+        <h2>Facility: {{ facility.name }}</h2>
+        <p>Address: {{ facility.address }}</p>
+        <p>Open: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
+        <p>{{ facility.state }}</p>
+        <ul class="list-group">
+            {% for offer in facility.offers.all %}
+                <h3>Offer: {{ forloop.counter0 }}, Type: {{ offer.variant }}</h3>
+                <li class="list-group-item">
+                    <ul class="list-group">
+                        {% for item in offer.items.all %}
+                            <li class="list-group-item">
+                                <h4>{{ item.name }}</h4>
+                                <p>Type: {{ item.variant }}</p>
+                                <img class"img-thumbnail" style="width: 200px;" src="{{ item.img.url }}">
+                                <p>Kolyk: {{ item.prize }} Kč</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    
+                </li>
+            {% endfor %}
+        </ul>
+
     </div>
 {% endblock %}

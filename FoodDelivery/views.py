@@ -6,7 +6,7 @@ def index(request):
 
     facilities = Facility.objects.all()
 
-    return render(request, 'app/index.html', {"facilities":facilities})
+    return render(request, 'app/index.html', {'facilities':facilities})
 
 def user_profile(request):
     return render(request, 'app/user_profile.html')
