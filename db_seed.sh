@@ -16,7 +16,7 @@ admin_g = Group(name='Administrator')
 admin_g.save()
 user.groups.add(driver_g, operators_g, admin_g)
 
-facility_1 = Facility(name='Na purkynce', address='Ono 98\n Tamto 765 15', state='A', opening_time=timezone.now(), closing_time=timezone.now())
+facility_1 = Facility(name='Na purkynce', address='Ono 98 Tamto 765 15', state='A', opening_time=timezone.now(), closing_time=timezone.now())
 facility_1.save()
 
 beer = Drink(name='Pivo 12', variant='', price=25, volume=500)
