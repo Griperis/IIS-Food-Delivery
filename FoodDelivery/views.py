@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, loader, HttpResponseRedirect
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
+
 import datetime
 from .cookies import *
 
@@ -23,6 +26,34 @@ def user_profile(request):
         password_form = PasswordChangeForm(user = user)
 
     return render(request, 'app/user_profile.html', {'orders' : orders, 'user_form' : user_form, 'password_form' : password_form, 'success' : success})
+
+def edit_user(request):
+    user = request.user
+    #TODO: handle not registered user
+    if request.method == 'POST':
+        user_form = CustomUserChangeForm(request.POST, instance=request.user)
+        if user_form.is_valid():
+            user.email = user_form.cleaned_data.get('email')
+            user.first_name = user_form.cleaned_data.get('first_name')
+            user.last_name = user_form.cleaned_data.get('last_name')
+            user.address = user_form.cleaned_data.get('address')
+            user.phone = user_form.cleaned_data.get('phone')
+            #TODO: kontrolovat formát tel. čísla
+            user.save()
+            return redirect(to='/user?success=true')
+        #TODO: mozna dalši return?
+
+def change_password(request):
+    user = request.user
+    #TODO: handle not registered user
+    if request.method == 'POST':
+        password_form = PasswordChangeForm(data=request.POST, user = user)
+        if password_form.is_valid():
+            new_password = password_form.cleaned_data.get('new_password1')
+            user.set_password(new_password)
+            user.save()
+
+        return redirect(to='/login')
 
 def filter_offers(facility, search_field, type_field):
     offers = facility.offers.all()
