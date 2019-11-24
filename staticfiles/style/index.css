@@ -1,0 +1,9 @@
+.facilities-list {
+    justify-content: space-around;
+}
+
+.facility-entry {
+    min-width: 250px;
+    padding: 10px;
+    margin: 10px;
+}
