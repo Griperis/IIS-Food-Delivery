@@ -15,7 +15,7 @@
         {% endfor %}
     </div>
     <p>Cena celkem: {{ summary.price }} Kč</p>
-    {% if user.is_authenticated and summary.price >= facility.min_prize %}
+    {% if user.is_authenticated and summary.price >= facility.min_price %}
         <form method="POST">
             {% csrf_token %}
             <button type="submit" class="btn btn-warning btn-block" {% if not can_order %} disabled {% endif %}>Objednat</button>

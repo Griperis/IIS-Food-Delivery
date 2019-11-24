@@ -81,7 +81,7 @@ class Facility(models.Model):
     closing_time = models.TimeField(name='closing_time')
     state = models.CharField(max_length=20, choices=FACILITY_STATE)
     offers = models.ManyToManyField(to=Offer, blank=True)
-    min_prize = models.IntegerField(default=0)
+    min_price = models.IntegerField(default=0)
 
     
     def __str__(self):
