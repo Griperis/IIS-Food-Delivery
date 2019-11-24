@@ -12,7 +12,7 @@
                 <input class="form-control" id="disabledInput" type="text" placeholder="{{ user.username }}" disabled>
             </p>
             {{ user_form.as_p }}
-            <input type="submit" class="btn btn-primary mb-2" value="Potvrdit změny">
+            <input type="submit" class="btn btn-warning mb-2" value="Potvrdit změny">
         </form>
 
     </div>
@@ -26,6 +26,6 @@
         {% csrf_token %}
         {{ password_form.as_p }}
         <small id="PasswordHelp" class="form-text text-muted mb-2">Heslo musí být minimálně 8 znaků dlouhé, nesmí být podobné osobním údajům ani známým heslům a nesmí se skládat jenom z číslic.</small>
-        <input type="submit" name="password" class="btn btn-primary mb-2" value="Změnit heslo">
+        <input type="submit" name="password" class="btn btn-warning mb-2" value="Změnit heslo">
     </form>
 {% endblock %}
