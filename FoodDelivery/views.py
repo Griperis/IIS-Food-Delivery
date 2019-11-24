@@ -12,6 +12,23 @@ def index(request):
 def user_profile(request):
     return render(request, 'app/user_profile.html')
 
+def filter_offers(facility, request):
+    search_field = ''
+    type_field = ''
+    if request.GET.get('search'):
+        search_field = request.GET['search']
+    if request.GET.get('type'):
+        type_field = request.GET['type']
+
+    offers = facility.offers.all()
+    filtered_offers = {}
+    for offer in offers:
+        if search_field != '':
+            filtered_items = offer.items.filter(name__contains=search_field)
+        else:
+            filtered_items = offer.items.all()
+        filtered_offers[offer.pk] = {'items': filtered_items, 'name': offer.name, 'variant': offer.variant}
+    return filtered_offers
 
 def create_new_order(order_state, facility_id, user):
     facility = get_object_or_404(Facility, pk=facility_id)
@@ -35,9 +52,10 @@ def facility_detail(request, facility_id):
         return response
     else:
         facility = get_object_or_404(Facility, pk=facility_id)
-        context = {'facility': facility, 'can_order': True, 'summary': {}}
+        filtered_offers = filter_offers(facility, request)
+
+        context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}}
         order_summary = load_order_state(request, str(facility_id))
-        
         if request.GET.get('add_item'):
             added_item_id = request.GET['add_item']
             order_summary = add_order_item(request, added_item_id, str(facility_id))

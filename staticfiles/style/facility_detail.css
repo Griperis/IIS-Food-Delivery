@@ -1,12 +1,17 @@
 .fd-summary-container {
     position: sticky;
     min-height: 400px;
+    max-width: 260px;
     z-index: 1;
     top: 20%;
     float: right;
     background: #292826;
     color: white;
     padding: 10px;
+}
+.fd-summary-items {
+    max-height: 300px;
+    overflow-y: auto;
 }
 .fd-offer-container {
     margin-top: 30px;
