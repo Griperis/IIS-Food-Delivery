@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
 from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm, CustomAuthenticationForm
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 
 
@@ -38,19 +37,18 @@ def user_profile(request):
 
 def edit_user(request):
     user = request.user
-    #TODO: handle not registered user
-    if request.method == 'POST':
-        user_form = CustomUserChangeForm(request.POST, instance=request.user)
-        if user_form.is_valid():
-            user.email = user_form.cleaned_data.get('email')
-            user.first_name = user_form.cleaned_data.get('first_name')
-            user.last_name = user_form.cleaned_data.get('last_name')
-            user.address = user_form.cleaned_data.get('address')
-            user.phone = user_form.cleaned_data.get('phone')
-            #TODO: kontrolovat formát tel. čísla
-            user.save()
-            return redirect(to='/user?success=true')
-        #TODO: mozna dalši return?
+    if user != None:
+        if request.method == 'POST':
+            user_form = CustomUserChangeForm(request.POST, instance=request.user)
+            if user_form.is_valid():
+                user.email = user_form.cleaned_data.get('email')
+                user.first_name = user_form.cleaned_data.get('first_name')
+                user.last_name = user_form.cleaned_data.get('last_name')
+                user.address = user_form.cleaned_data.get('address')
+                user.phone = user_form.cleaned_data.get('phone')
+                #TODO: kontrolovat formát tel. čísla
+                user.save()
+                return redirect(to='/user?success=true')
 
 def change_password(request):
     user = request.user

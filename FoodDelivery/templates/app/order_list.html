@@ -8,8 +8,15 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6 font-weight-bold">Stav objednávky:</div>
-                <div class="col-md-6 text-right">{{ order_data.order.state }}</div>
-                <!--TODO: add color of text-->
+                    {% if order_data.order.state == "A" %}
+                        <div class="col-md-6 text-right text-success">Přijata</div>
+                    {% elif order_data.order.state == "D" %}
+                        <div class="col-md-6 text-right">Na cestě</div>
+                    {% elif order_data.order.state == "F" %}
+                        <div class="col-md-6 text-right">Doručena</div>
+                    {% else%}
+                        <div class="col-md-6 text-right">Neznámý</div>
+                    {% endif %}
             </div>
         </div>
 
