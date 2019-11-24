@@ -17,6 +17,10 @@ def user_profile(request):
     orders = Order.objects.all().filter(created_by = user)
     orders_with_data = []
 
+    success = -1
+    pwdsuccess = -1
+    goto_info = False
+
     for order in orders:
         items = OrderItem.objects.all().filter(order = order)
         order_data = {"order" : order, "items" : items}
@@ -24,17 +28,23 @@ def user_profile(request):
     
     orders_with_data.reverse()
 
-    success = False
-    pwderror = False
-
     if request.method == 'GET':
-        success = "true" == request.GET.get("success",'')
-        pwderror = "true" == request.GET.get("pwderror",'')
+        if request.GET.get("success",'') == "1":
+            success = 1
+        if request.GET.get("success",'') == "0":
+            success = 0
+        if request.GET.get("pwdsuccess",'') == "1":
+            pwdsuccess = 1
+        if request.GET.get("pwdsuccess",'') == "0":
+            pwdsuccess = 0
+        
+        if request.GET.get("tab",'') == "info":
+            goto_info = True
 
         user_form = CustomUserChangeForm(initial={ 'username' : user.username, 'email' : user.email, 'first_name' : user.first_name, 'last_name' : user.last_name, 'address' : user.address, 'phone' : user.phone})
         password_form = CustomPasswordChangeForm(user = user)
 
-    return render(request, 'app/user_profile.html', {'orders_with_data' : orders_with_data, 'user_form' : user_form, 'password_form' : password_form, 'success' : success, 'pwderror' : pwderror})
+    return render(request, 'app/user_profile.html', {'orders_with_data' : orders_with_data, 'user_form' : user_form, 'password_form' : password_form, 'success' : success, 'pwdsuccess' : pwdsuccess, 'goto_info' : goto_info})
 
 def edit_user(request):
     user = request.user
@@ -47,9 +57,9 @@ def edit_user(request):
                 user.last_name = user_form.cleaned_data.get('last_name')
                 user.address = user_form.cleaned_data.get('address')
                 user.phone = user_form.cleaned_data.get('phone')
-                #TODO: kontrolovat formát tel. čísla
                 user.save()
-                return redirect(to='/user?success=true')
+                return redirect(to='/user?success=1&tab=info')
+            return redirect(to='/user?success=0&tab=info')
 
 def change_password(request):
     user = request.user
@@ -61,7 +71,7 @@ def change_password(request):
                 user.set_password(new_password)
                 user.save()
                 return redirect(to='/login')
-            return redirect(to='/user?pwderror=true')
+            return redirect(to='/user?pwdsuccess=0&tab=info')
 
 def filter_offers(facility, search_field, type_field):
     offers = facility.offers.all()
@@ -150,7 +160,10 @@ def admin(request):
     return render(request, 'app/admin.html')
 
 def register(request):
+
     next = request.GET.get('next', '/')
+    user_exists = False
+
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
 
@@ -161,24 +174,22 @@ def register(request):
             new_last_name = form.cleaned_data.get('last_name')
             new_address = form.cleaned_data.get('address')
             new_phone = form.cleaned_data.get('phone')
-            #TODO: kontrolovat formát tel. čísla
-            #TODO: ošetřit pokud jsou špatné údaje
             new_password = form.cleaned_data.get('password1')
 
             new_user = CustomUser(username = new_username, email = new_email, first_name = new_first_name, last_name = new_last_name, address = new_address, phone = new_phone)
             new_user.set_password(new_password)
-            new_user.save()
-            
-            user = authenticate(username = new_username, password = new_password)
-            if user is not None:
+            try:
+                new_user.save()
+                user = authenticate(username = new_username, password = new_password)
                 login(request, user)
-                
-            return redirect(to = next)
-        #TODO: else?
+                return redirect(to = next)
+            
+            except Exception:
+                user_exists = True           
     else:
         form = CustomUserCreationForm()
 
-    return render(request, 'authentication/register.html', {'form': form})
+    return render(request, 'authentication/register.html', {'form': form, 'user_exists': user_exists})
 
 def login_user(request):
     next = request.GET.get('next', '/')

@@ -2,8 +2,10 @@
     
     <div class="pt-2">
         <h3>Změna osobních údajů</h3>
-        {% if success %}
+        {% if success == 1 %}
             <p class="font-weight-bold text-success">Hodnoty úspěšně změněny!</p>
+        {% elif success == 0 %}
+            <p class="font-weight-bold text-danger">Hodnoty nebyly změněny, špatný formát v některém poli!</p>
         {% endif %}
         <form action="{% url 'edit_user' %}" method="post">
             {% csrf_token %}
@@ -19,9 +21,11 @@
 
 
     <h3>Změna hesla</h3>
-    {% if pwderror %}
-        <p class="font-weight-bold text-danger">Chyba při změně hesla!</p>
-    {% endif %}
+        {% if pwdsuccess == 1 %}
+            <p class="font-weight-bold text-success">Heslo úspěšně změněno!</p>
+        {% elif pwdsuccess == 0 %}
+            <p class="font-weight-bold text-danger">Heslo nebylo změněno!</p>
+        {% endif %}
     <form action="{% url 'change_password' %}" method="post">
         {% csrf_token %}
         {{ password_form.as_p }}

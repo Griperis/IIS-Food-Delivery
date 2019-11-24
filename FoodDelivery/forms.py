@@ -1,14 +1,26 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm, AuthenticationForm, UsernameField
 from .models import CustomUser, Food, Facility
+import re 
 
 from django.utils.translation import gettext_lazy as _
 
+def is_valid_phone(phone):
+    if phone == None:
+        return True
+    if re.match(r"^(\+?)((\s)?\d{3}){3,4}$",phone) != None:
+        return True
+    return False
+
 class CustomUserCreationForm(UserCreationForm):
-    error_messages = {
-        'password_mismatch': _("Hesla nejsou stejná."),
-    }
-    username = forms.CharField(label=_("Uživatelské jméno*"), strip=False, widget=forms.TextInput(attrs={'class': 'form-control'}), help_text="TODO",)
+    def clean_phone(self):
+        cleaned_data = self.clean()
+        phone = cleaned_data.get('phone')
+        if not is_valid_phone(phone):
+            self.add_error('phone', "Špatný formát telefonního čísla")
+        return phone
+
+    username = forms.CharField(label=_("Uživatelské jméno*"), strip=False, widget=forms.TextInput(attrs={'class': 'form-control'}),)
 
     password1 = forms.CharField(
         label=_("Heslo*"),
@@ -20,6 +32,7 @@ class CustomUserCreationForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         strip=False,
     )
+
     class Meta(UserCreationForm):
         model = CustomUser
         fields = ('email', 'first_name', 'last_name', 'address', 'phone')
@@ -33,6 +46,14 @@ class CustomUserCreationForm(UserCreationForm):
 class CustomUserChangeForm(UserChangeForm):
     password = None
     
+    def clean_phone(self):
+        cleaned_data = self.clean()
+        phone = cleaned_data.get('phone')
+        if not is_valid_phone(phone):
+            print("Spatny telefon")
+            self.add_error('phone', "Špatný formát telefonního čísla")
+        return phone
+
     class Meta:
         model = CustomUser
         fields = ('email', 'first_name', 'last_name', 'address', 'phone')
