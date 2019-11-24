@@ -1,39 +1,88 @@
 {% extends 'app/base.html'%}
+{% load model_extras %}
 
 {% block content %}
-    <div class="container">
-        <h2>Restaurace: {{ facility.name }}</h2>
-        <p>Adresa: {{ facility.address }}</p>
-        <p>Otevreno: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
-        <p>{{ facility.state }}</p>
+<div class="fd-summary-container rounded shadow-lg">
+    <h3>Shrnutí objednávky</h3>
+    <div class="fd-summary-items">
+        {% for entry in summary.order %}
+            {{ entry.count }}x {{ entry.item.name }}
+            <form method="GET">
+                <button type="submit" class="btn btn-warning" name="remove_item" value="{{ entry.item.pk }}">Odebrat</button>
+            </form>
+        {% empty %}
+        Žádné položky
+        {% endfor %}
+    </div>
+    <p>Cena celkem: {{ summary.price }} Kč</p>
+    {% if user.is_authenticated and summary.price >= facility.min_prize %}
         <form method="POST">
             {% csrf_token %}
-            <ul class="list-group">
-                {% for offer in facility.offers.all %}
-                    <h3>Nabidka {{ forloop.counter0 }}: {{ offer.name }}, Typ:  {{ offer.variant }}</h3>
-                    <li class="list-group-item">
-                        <ul class="list-group">
-                            {% for item in offer.items.all %}
-                                <li class="list-group-item">
-                                    {% comment %} Image with no image available picture when item.img is not set {% endcomment %}
-                                    <img style="width: 200px;" 
-                                        src="{% if item.img %}{{ item.img.url }}{% endif %}" 
-                                        onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'"
-                                    >
-                                    <h4>{{ item.name }}</h4>
-                                    <p>Typ: {{ item.variant }}</p>
-                                    <p>Cena: {{ item.price }} Kč</p>
-                                    <label>
-                                        Množství:
-                                        <input type="number" name="{{ offer.pk }};{{ item.pk }}"min="0" value="0">
-                                    </label>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endfor %}
-            </ul>
-            <button type="submit">Order</button>
+            <button type="submit" class="btn btn-warning btn-block" {% if not can_order %} disabled {% endif %}>Objednat</button>
         </form>
+    {% elif not user.is_authenticated %}
+        Pro objednání musíte být přihlášen nebo zaregistrován
+        <div class="btn-group">
+            <a href="{% url 'login' %}" class="btn btn-warning">Přihlásit se</a>
+            <a href="{% url 'register' %}" class="btn btn-warning">Registrovat se</a>
+        </div>
+    {% else %}
+        Minimální cena objednávky: <br>
+        {{ facility.min_prize }} Kč
+    {% endif %}
+</div>
+<div class="container mt-5 shadow ml-5 p-4">
+    <h3>Provozovna: {{ facility.name }}</h3>
+    <p><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
+    <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
+    {% if facility|fac_is_open %}
+        <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
+        {% if facility.state == 'A' %}
+            <p><i class="fas fa-circle online-symbol"></i> Příjmá objednávky</p>
+        {% elif facility.state == 'D' %}
+            <p><i class="fas fa-circle offline-symbol"></i> Nepříjmá objednávky</p>
+        {% endif %}
+    {% else %}
+        <p><i class="fas fa-circle offline-symbol"></i> Zavřeno</p>
+    {% endif %}
+
+</div>
+<div class="container pb-4 ml-5 shadow p-4">
+    <form class="form-inline mt-3" method="GET">
+        <h2 class="mr-auto">Aktuální nabídka</h2>
+        <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
+        <select name="filter-type" class="form-control mr-2">
+            <option value="name" {% if search_form.type == 'name' %} selected {% endif %}>Jméno</option>
+            <option value="type" {% if search_form.type == 'type' %} selected {% endif %}>Typ</option>
+        </select>
+        <button class="btn btn-warning" type="submit">Hledat <i class="fas fa-search"></i></button>
+    </form>
+    {% for offer in offers.values %}
+    <div class="fd-offer-container">
+        <h3>{{ offer.name }} - {% if offer.variant == 'P' %}Stálá nabídka{% elif offer.variant == 'D'%}Denní nabídka{% endif %}</h3>
+        <div class="d-flex flex-wrap">
+        {% for item in offer.items %}
+            <div class="shadow m-2 p-2">
+            {% comment %} Image with no image available picture when item.img is not set {% endcomment %}
+            <img style="height: 200px;" class="rounded" src="{% if item.img %}{{ item.img.url }}{% endif %}"
+                onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'">
+            <div class="mt-2">
+                <h4>{{ item.name }}</h4>
+                {% if item.variant != '' %}<p>Typ: {{ item.variant }}</p>{% endif %}
+                {% if item.volume %}<p>Objem: {{ item.volume }}</p> {% endif %}
+                <p>Cena: {{ item.price }} Kč</p>
+                {% if not item.in_stock %}&times; Momentálně nedostupné{% endif %}
+                <form method="GET" action="">
+                    <button type="submit" class="btn btn-warning mt-auto" name="add_item" 
+                    value="{{ item.pk }}" {% if not item.in_stock or not facility|fac_is_open or facility.state == 'D' %} disabled {% endif %}>Přidat</button>
+                </form>
+                </div>
+            </div>
+            {% empty %}
+            Žádné pokrmy v této nabídce neodpovídají zadanému výrazu
+            {% endfor %}
+        </div>
     </div>
+    {% endfor %}
+</div>
 {% endblock %}

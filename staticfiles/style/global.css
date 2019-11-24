@@ -1,0 +1,36 @@
+h1, h2, h3, h4 {
+    color: #f9d342;
+}
+.color-yellow {
+    color: #f9d342;
+}
+.background-dark {
+    background: #292826;
+}
+.color-white {
+    color: white;
+}
+html, body {
+    font-family: 'Roboto', sans-serif;
+    height: 100%;
+    margin: 0;
+}
+
+.navbar-wrapper {
+    z-index: 1;
+}
+.wrapper {
+    min-height: 100%;
+    margin-bottom: -130px;
+}
+
+.footer {
+    height: 130x;
+    padding: 5px;
+    background: #292826;
+    color: white;
+    z-index: 1;
+}
+
+
+

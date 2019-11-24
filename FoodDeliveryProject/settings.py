@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'FoodDelivery.apps.FooddeliveryConfig',
+    'FoodDelivery.apps.FoodDeliveryConfig',
     'django.contrib.admin',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
