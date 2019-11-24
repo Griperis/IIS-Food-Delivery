@@ -8,7 +8,7 @@ def index(request):
 
     facilities = Facility.objects.all()
 
-    return render(request, 'app/index.html', {'facilities':facilities})
+    return render(request, 'app/index.html', {'facilities': facilities})
 
 def user_profile(request):
     return render(request, 'app/user_profile.html')
@@ -63,8 +63,7 @@ def facility_detail(request, facility_id):
         now = datetime.datetime.now().time()
         is_open = now >= facility.opening_time and facility.closing_time <= now
         print(is_open)
-
-        context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}, 'search_form': search_form, 'is_open': is_open}
+        context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}, 'search_form': search_form }
 
         order_summary = load_order_state(request, str(facility_id))
         if request.GET.get('add_item'):
