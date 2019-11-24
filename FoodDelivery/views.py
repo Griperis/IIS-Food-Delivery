@@ -5,6 +5,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 
+import datetime
 
 def index(request):
 
@@ -86,11 +87,43 @@ def facility_detail(request, facility_id):
         facility = get_object_or_404(Facility, pk=facility_id)
         return render(request, 'app/facility/facility_detail.html', {'facility': facility})
 
-def operator(request):
+def operator(request, driver_id):
     return render(request, 'app/operator.html')
 
 def driver(request):
-    return render(request, 'app/driver.html', )
+    context = { 'orders' : Order.objects.all().order_by('-date')[::-1],
+                'facilities' : Facility.objects.all() }
+    
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+
+        if order_id != None:
+            order = get_object_or_404(Order, pk=order_id)
+            order.state = 'F'
+            order.save()
+    elif request.method == 'GET':
+        filter_state = request.GET.get('filter_state')
+        filter_facility = request.GET.get('filter_facility')
+        filter_date = request.GET.get('time')
+
+        if filter_state != None and filter_facility != None and filter_date != None:
+            if filter_date == '':
+                filter_date = datetime.date.today()
+ 
+            print(filter_date) #TODO: debug
+
+            if filter_facility == 'all':
+                if filter_state != 'all':
+                    context['orders'] = Order.objects.filter(state=filter_state,date__gte=filter_date).order_by('-date')[::-1]
+                else:
+                    context['orders'] = Order.objects.filter(date__gte=filter_date).order_by('-date')[::-1]
+            else:
+                if filter_state != 'all':
+                    context['orders'] = Order.objects.filter(state=filter_state, belongs_to=filter_facility,date__gte=filter_date).order_by('-date')[::-1]
+                elif filter_facility != None:
+                    context['orders'] = Order.objects.filter(belongs_to=filter_facility,date__gte=filter_date).order_by('-date')[::-1]
+
+    return render(request, 'app/driver.html', context)
 
 def admin(request):
     return render(request, 'app/admin.html')
