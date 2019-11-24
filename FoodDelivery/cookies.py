@@ -47,7 +47,10 @@ def load_order_state(request, facility_id):
         return {'order': {}, 'prize': 0}
     else:
         item_count = json.loads(order_state)
-        return parse_order_state(item_count[facility_id])
+        if facility_id in item_count:
+            return parse_order_state(item_count[facility_id])
+        else:
+            return {'order': {}, 'prize':0}
 
 def save_order_state(response, order_state, facility_id):
     to_serialize = {facility_id: {}}

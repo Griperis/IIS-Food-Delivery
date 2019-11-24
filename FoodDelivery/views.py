@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, loader, HttpResponseRedirect
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
 from .forms import CustomUserCreationForm
+import datetime
 from .cookies import *
 
 def index(request):
@@ -12,19 +13,15 @@ def index(request):
 def user_profile(request):
     return render(request, 'app/user_profile.html')
 
-def filter_offers(facility, request):
-    search_field = ''
-    type_field = ''
-    if request.GET.get('search'):
-        search_field = request.GET['search']
-    if request.GET.get('type'):
-        type_field = request.GET['type']
-
+def filter_offers(facility, search_field, type_field):
     offers = facility.offers.all()
     filtered_offers = {}
     for offer in offers:
         if search_field != '':
-            filtered_items = offer.items.filter(name__contains=search_field)
+            if type_field == 'type':
+                filtered_items = offer.items.filter(variant__contains=search_field)
+            else:
+                filtered_items = offer.items.filter(name__contains=search_field)
         else:
             filtered_items = offer.items.all()
         filtered_offers[offer.pk] = {'items': filtered_items, 'name': offer.name, 'variant': offer.variant}
@@ -52,9 +49,23 @@ def facility_detail(request, facility_id):
         return response
     else:
         facility = get_object_or_404(Facility, pk=facility_id)
-        filtered_offers = filter_offers(facility, request)
 
-        context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}}
+        search_field = ''
+        type_field = ''
+        if request.GET.get('search'):
+            search_field = request.GET['search']
+        if request.GET.get('filter-type'):
+            type_field = request.GET['filter-type']
+
+        search_form = {'search': search_field, 'type': type_field}
+        filtered_offers = filter_offers(facility, search_field, type_field)
+        
+        now = datetime.datetime.now().time()
+        is_open = now >= facility.opening_time and facility.closing_time <= now
+        print(is_open)
+
+        context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}, 'search_form': search_form, 'is_open': is_open}
+
         order_summary = load_order_state(request, str(facility_id))
         if request.GET.get('add_item'):
             added_item_id = request.GET['add_item']
@@ -62,8 +73,13 @@ def facility_detail(request, facility_id):
         elif request.GET.get('remove_item'):
             removed_item_id = request.GET['remove_item']
             order_summary = remove_order_item(request, removed_item_id, str(facility_id))
+        
         if len(order_summary['order']) == 0:
             context['can_order'] = False
+
+        if facility.state == 'D' or not is_open: 
+            context['can_order'] = False
+
         context['summary'] = order_summary
         response = render(request, 'app/facility/facility_detail.html', context)
         

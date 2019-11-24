@@ -14,40 +14,47 @@
         {% endfor %}
     </div>
     <p>Cena celkem: {{ summary.price }} Kč</p>
-    {% if user.is_authenticated %}
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-warning btn-block" {% if not can_order %} disabled {% endif %}>Objednat</button>
-    </form>
+    {% if user.is_authenticated and summary.price >= facility.min_prize %}
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning btn-block" {% if not can_order %} disabled {% endif %}>Objednat</button>
+        </form>
     {% elif not user.is_authenticated %}
-    Pro objednání musíte být přihlášen nebo zaregistrován
-    <div class="btn-group">
-        <a href="{% url 'login' %}" class="btn btn-warning">Přihlásit se</a>
-        <a href="{% url 'register' %}" class="btn btn-warning">Registrovat se</a>
-    </div>
+        Pro objednání musíte být přihlášen nebo zaregistrován
+        <div class="btn-group">
+            <a href="{% url 'login' %}" class="btn btn-warning">Přihlásit se</a>
+            <a href="{% url 'register' %}" class="btn btn-warning">Registrovat se</a>
+        </div>
+    {% else %}
+        Minimální cena objednávky: <br>
+        {{ facility.min_prize }} Kč
     {% endif %}
 </div>
-<div class="container mt-2">
-    <h3>{{ facility.name }}</h3>
+<div class="container mt-5 shadow ml-5 p-2">
+    <h3>Provozovna: {{ facility.name }}</h3>
     <p><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
-    <p><i class="fas fa-clock color-yellow"></i> Otevřeno: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
-    {% if facility.state == 'A' %}
-        <i class="fas fa-circle online-symbol"></i>
-        Aktuálně příjmá objednávky
-    {% elif facility.state == 'D' %}
-        <i class="fas fa-circle offline-symbol"></i>
-        Nepříjmá objednávky
+    <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
+    {% if is_open %}
+        <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
+    {% else %}
+        <p><i class="fas fa-circle offline-symbol"></i> Zavřeno</p>
     {% endif %}
+    {% if facility.state == 'A' %}
+        <p><i class="fas fa-circle online-symbol"></i> Příjmá objednávky</p>
+    {% elif facility.state == 'D' %}
+        <p><i class="fas fa-circle offline-symbol"></i> Nepříjmá objednávky</p>
+    {% endif %}
+</div>
+<div class="container pb-4 ml-5">
     <form class="form-inline mt-3" method="GET">
-        <input class="form-control mr-2" type="text" name="search" placeholder="Vyhledat v pokrmech">
-        <select name="filter" class="form-control mr-2">
-            <option value="name">Jméno</option>
-            <option value="type">Typ</option>
+        <h2 class="mr-auto">Aktuální nabídka</h2>
+        <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
+        <select name="filter-type" class="form-control mr-2">
+            <option value="name" {% if search_form.type == 'name' %} selected {% endif %}>Jméno</option>
+            <option value="type" {% if search_form.type == 'type' %} selected {% endif %}>Typ</option>
         </select>
         <button class="btn btn-warning" type="submit">Hledat <i class="fas fa-search"></i></button>
     </form>
-</div>
-<div class="container">
     {% for offer in offers.values %}
     <div class="fd-offer-container">
         <h3>{{ offer.name }}, Typ: {% if offer.variant == 'P' %}Stálá{% elif offer.variant == 'D'%}Denní{% endif %}</h3>
@@ -64,7 +71,8 @@
                 <p>Cena: {{ item.price }} Kč</p>
                 {% if not item.in_stock %}&times; Momentálně nedostupné{% endif %}
                 <form method="GET" action="">
-                    <button type="submit" class="btn btn-warning" name="add_item" value="{{ item.pk }}" {% if not item.in_stock %} disabled {% endif %}>Přidat</button>
+                    <button type="submit" class="btn btn-warning mt-auto" name="add_item" 
+                    value="{{ item.pk }}" {% if not item.in_stock or not is_open or facility.state == 'D' %} disabled {% endif %}>Přidat</button>
                 </form>
                 </div>
             </div>

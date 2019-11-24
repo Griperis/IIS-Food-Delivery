@@ -15,7 +15,3 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = CustomUser
         fields = ('username', 'email')
-
-class ItemSearchForm(forms.Form):
-    search_field = forms.CharField(label='Vyhledat', max_length=100)
-    
