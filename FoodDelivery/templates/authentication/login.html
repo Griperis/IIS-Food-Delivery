@@ -9,9 +9,8 @@
     {% endif %}
     <form method="post" action="">
       {% csrf_token %}
-      <p>{{ form.username }}</p>
-      <p>{{ form.password }}</p>
-      <input type="hidden" name="next" value="{{ request.path }}">
+      <p>{{ form.username.label }}{{ form.username }}</p>
+      <p>{{ form.password.label }}{{ form.password }}</p>
       <input type="submit" class="btn btn-primary mb-2" value="Přihlásit se" />
     </form>
   </div>

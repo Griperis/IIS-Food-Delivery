@@ -8,25 +8,23 @@ class CustomUserCreationForm(UserCreationForm):
     error_messages = {
         'password_mismatch': _("Hesla nejsou stejná."),
     }
+    username = forms.CharField(label=_("Uživatelské jméno*"), strip=False, widget=forms.TextInput(attrs={'class': 'form-control'}), help_text="TODO",)
+
     password1 = forms.CharField(
-        label=_("Heslo"),
+        label=_("Heslo*"),
         strip=False,
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        help_text="TODO",
     )
     password2 = forms.CharField(
-        label=_("Potvrzení Hesla"),
+        label=_("Heslo znovu*"),
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         strip=False,
-        help_text=_("Vložte znovu heslo"),
     )
     class Meta(UserCreationForm):
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'address', 'phone')
-        labels = {'username': _('Uživatelské jméno'), 'email': _('Emailová adresa'),'first_name': _('Jméno'),
-        'last_name': _('Příjmení'),'address': _('Adresa'),'phone': _('Telefonní číslo'),}
-        widgets = {'username': forms.TextInput(attrs={'class': 'form-control'}),
-                   'email': forms.TextInput(attrs={'class': 'form-control'}),
+        fields = ('email', 'first_name', 'last_name', 'address', 'phone')
+        labels = {'email': _('Emailová adresa'),'first_name': _('Jméno'),'last_name': _('Příjmení'),'address': _('Adresa'),'phone': _('Telefonní číslo'),}
+        widgets = {'email': forms.TextInput(attrs={'class': 'form-control'}),
                    'first_name': forms.TextInput(attrs={'class': 'form-control'}),
                    'last_name': forms.TextInput(attrs={'class': 'form-control'}),
                    'address': forms.TextInput(attrs={'class': 'form-control'}),

@@ -106,6 +106,7 @@ def admin(request):
     return render(request, 'app/admin.html')
 
 def register(request):
+    next = request.GET.get('next', '/')
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         
@@ -117,14 +118,19 @@ def register(request):
             new_address = form.cleaned_data.get('address')
             new_phone = form.cleaned_data.get('phone')
             #TODO: kontrolovat formát tel. čísla
+            #TODO: ošetřit pokud jsou špatné údaje
             new_password = form.cleaned_data.get('password1')
 
             new_user = CustomUser(username = new_username, email = new_email, first_name = new_first_name, last_name = new_last_name, address = new_address, phone = new_phone)
             new_user.set_password(new_password)
             new_user.save()
             
-            return redirect(to = 'login')
+            user = authenticate(username = new_username, password = new_password)
+            if user is not None:
+                login(request, user)
 
+            return redirect(to = next)
+        #TODO: else?
     else:
         form = CustomUserCreationForm()
 
