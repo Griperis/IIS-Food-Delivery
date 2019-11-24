@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm, AuthenticationForm, UsernameField
 from .models import CustomUser, Food, Facility
 
 from django.utils.translation import gettext_lazy as _
@@ -47,17 +47,22 @@ class CustomUserChangeForm(UserChangeForm):
                 
 class CustomPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
-        label=_("Staré heslo"),
+        label=_("Staré heslo*"),
         strip=False,
         widget=forms.PasswordInput(attrs={'autofocus': True, 'class': 'form-control'}),
     )
     new_password1 = forms.CharField(
-        label=_("Nové heslo"),
+        label=_("Nové heslo*"),
         strip=False,
         widget=forms.PasswordInput(attrs={'autofocus': True, 'class': 'form-control'}),
     )
     new_password2 = forms.CharField(
-        label=_("Znovu nové heslo"),
+        label=_("Znovu nové heslo*"),
         strip=False,
         widget=forms.PasswordInput(attrs={'autofocus': True, 'class': 'form-control'}),
     )
+
+class CustomAuthenticationForm(AuthenticationForm):
+    username = UsernameField(label=_("Uživatelské jméno"),widget=forms.TextInput(attrs={'autofocus': True, 'class': 'form-control'}))
+    password = forms.CharField(label=_("Heslo"),strip=False,widget=forms.PasswordInput(attrs={'class': 'form-control'}),)
+    error_messages = {'invalid_login': _("Špatné uživatelské jméno nebo heslo."),'inactive': _("Tento účet je neaktivní."),}
