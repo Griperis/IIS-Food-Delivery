@@ -34,7 +34,7 @@
 <div class="container mt-5 shadow ml-5 p-4">
     <h3>Provozovna: {{ facility.name }}</h3>
     <p><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
-    <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
+    <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility|print_opening_hours }}</p>
     {% if facility|fac_is_open %}
         <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
         {% if facility.state == 'A' %}

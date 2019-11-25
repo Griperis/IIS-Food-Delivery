@@ -9,7 +9,7 @@
         <div class="shadow facility-entry">
             <h3>{{ facility.name }}</h3>
             <p><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
-            <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility.opening_time }} - {{ facility.closing_time }}</p>
+            <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility|print_opening_hours }}</p>
             {% if facility|fac_is_open %}
                 <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
             {% else %}
