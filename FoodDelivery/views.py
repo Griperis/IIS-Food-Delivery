@@ -100,6 +100,13 @@ def create_new_order(order_state, facility_id, user):
         oi.save()
         new_order.items.add(entry['item'])
 
+def is_fac_open(facility):
+    now = datetime.datetime.now().time()
+    if facility.opening_time < now:
+        return facility.opening_time <= now < facility.closing_time
+    else:
+        return facility.opening_time <= now or now <= facility.closing_time
+
 def facility_detail(request, facility_id):
     if request.method == 'POST':
         order_state = load_order_state(request, str(facility_id))
@@ -121,8 +128,7 @@ def facility_detail(request, facility_id):
         filtered_offers = filter_offers(facility, search_field, type_field)
 
         now = datetime.datetime.now().time()
-        is_open = now >= facility.opening_time and facility.closing_time <= now
-        print(is_open)
+        is_open = is_fac_open(facility)
         context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}, 'search_form': search_form }
 
         order_summary = load_order_state(request, str(facility_id))
