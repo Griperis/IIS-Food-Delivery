@@ -128,8 +128,8 @@ def facility_detail(request, facility_id):
 
         if request.GET.get('search'):
             search_field = request.GET['search']
-        if request.GET.get('filter-type'):
-            type_field = request.GET['filter-type']
+        if request.GET.get('filter_type'):
+            type_field = request.GET['filter_type']
         
         if search_field == '':
             filter_form = load_form_state(request)

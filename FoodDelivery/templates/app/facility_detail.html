@@ -36,8 +36,8 @@
     {% endif %}
 </div>
 <div class="container shadow mb-5 ml-5 p-4">
-    <h3>Provozovna: {{ facility.name }}</h3>
-    <p><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
+    <h3 class="text-truncate">Provozovna: {{ facility.name }}</h3>
+    <p class="text-truncate"><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
     <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility|print_opening_hours }}</p>
     {% if facility|fac_is_open %}
         <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
@@ -59,7 +59,7 @@
                 <button class="btn close mr-2" type="submit" name="submit" value="remove_filter">&times;</button>
             {% endif %}
             <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
-            <select name="filter-type" class="form-control mr-2">
+            <select name="filter_type" class="form-control mr-2">
                 <option value="name" {% if search_form.type == 'name' %} selected {% endif %}>Jméno</option>
                 <option value="type" {% if search_form.type == 'type' %} selected {% endif %}>Typ</option>
             </select>
