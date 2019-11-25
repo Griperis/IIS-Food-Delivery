@@ -1,13 +1,12 @@
 {% extends 'app/base.html'%}
 {% load model_extras %}
-
 {% block content %}
 <div class="fd-summary-container rounded shadow-lg">
     <h3>Shrnutí objednávky</h3>
     <div class="fd-summary-items">
         {% for entry in summary.order %}
             {{ entry.count }}x {{ entry.item.name }}
-            <form method="GET">
+            <form method="GET" class="reload-scroll-back">
                 <button type="submit" class="btn btn-warning" name="remove_item" value="{{ entry.item.pk }}">Odebrat</button>
             </form>
         {% empty %}
@@ -23,8 +22,8 @@
     {% elif not user.is_authenticated %}
         Pro objednání musíte být přihlášen nebo zaregistrován
         <div class="btn-group">
-            <a href="{% url 'login' %}" class="btn btn-warning">Přihlásit se</a>
-            <a href="{% url 'register' %}" class="btn btn-warning">Registrovat se</a>
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-warning">Přihlásit se</a>
+            <a href="{% url 'register' %}?next={{ request.path }}" class="btn btn-warning">Registrovat se</a>
         </div>
     {% else %}
         Minimální cena objednávky: <br>
@@ -47,7 +46,7 @@
     {% endif %}
 
 </div>
-<div class="container pb-4 ml-5 shadow p-4">
+<div class="container mb-5 pb-4 ml-5 shadow p-4">
     <form class="form-inline mt-3" method="GET">
         <h2 class="mr-auto">Aktuální nabídka</h2>
         <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
@@ -72,7 +71,7 @@
                 {% if item.volume %}<p>Objem: {{ item.volume }}</p> {% endif %}
                 <p>Cena: {{ item.price }} Kč</p>
                 {% if not item.in_stock %}&times; Momentálně nedostupné{% endif %}
-                <form method="GET" action="">
+                <form method="GET" action="" class="reload-scroll-back">
                     <button type="submit" class="btn btn-warning mt-auto" name="add_item" 
                     value="{{ item.pk }}" {% if not item.in_stock or not facility|fac_is_open or facility.state == 'D' %} disabled {% endif %}>Přidat</button>
                 </form>

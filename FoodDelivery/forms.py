@@ -68,17 +68,17 @@ class CustomPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
         label=_("Staré heslo*"),
         strip=False,
-        widget=forms.PasswordInput(attrs={'autofocus': True, 'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
     )
     new_password1 = forms.CharField(
         label=_("Nové heslo*"),
         strip=False,
-        widget=forms.PasswordInput(attrs={'autofocus': True, 'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
     )
     new_password2 = forms.CharField(
         label=_("Znovu nové heslo*"),
         strip=False,
-        widget=forms.PasswordInput(attrs={'autofocus': True, 'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
     )
 
 class CustomAuthenticationForm(AuthenticationForm):

@@ -8,7 +8,6 @@ def fac_is_open(facility):
     if facility.opening_time == facility.closing_time:
         return True
     now = datetime.datetime.now().time()
-    print(now, facility.opening_time, facility.closing_time)
     if facility.opening_time < now:
         return facility.opening_time <= now < facility.closing_time
     else:

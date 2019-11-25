@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, loader, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, loader, HttpResponseRedirect, reverse
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
 from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm, CustomAuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -99,8 +99,12 @@ def create_new_order(order_state, facility_id, user):
         oi = OrderItem(item=entry['item'], order=new_order, count=entry['count'])
         oi.save()
         new_order.items.add(entry['item'])
+    
+    return new_order.id
 
 def is_fac_open(facility):
+    if facility.opening_time == facility.closing_time:
+        return True
     now = datetime.datetime.now().time()
     if facility.opening_time < now:
         return facility.opening_time <= now < facility.closing_time
@@ -110,8 +114,8 @@ def is_fac_open(facility):
 def facility_detail(request, facility_id):
     if request.method == 'POST':
         order_state = load_order_state(request, str(facility_id))
-        create_new_order(order_state, facility_id, request.user)
-        response = redirect('user_profile')
+        order_id = create_new_order(order_state, facility_id, request.user)
+        response = redirect('order_summary', order_id)
         remove_order_cookies(response)
         return response
     else:
@@ -127,7 +131,6 @@ def facility_detail(request, facility_id):
         search_form = {'search': search_field, 'type': type_field}
         filtered_offers = filter_offers(facility, search_field, type_field)
 
-        now = datetime.datetime.now().time()
         is_open = is_fac_open(facility)
         context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}, 'search_form': search_form }
 
@@ -147,14 +150,15 @@ def facility_detail(request, facility_id):
 
         context['summary'] = order_summary
         response = render(request, 'app/facility/facility_detail.html', context)
-
         if (order_summary):
             save_order_state(response, order_summary['order'], str(facility_id))
         return response
 
 def order_summary(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
-    return render(request, 'app/order/order_summary.html', {'order': order })
+    order_items = OrderItem.objects.all().filter(order=order_id)
+    order_data = {'order': order, 'items': order_items }
+    return render(request, 'app/order/order_summary.html', { 'order_data': order_data })
 
 def operator(request, driver_id):
     return render(request, 'app/operator.html')

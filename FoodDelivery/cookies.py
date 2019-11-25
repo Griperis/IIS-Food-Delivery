@@ -6,7 +6,10 @@ def parse_order_state(item_count):
     ret_val = []
     total_price = 0
     for item_id, count in item_count.items():
-        item = Item.objects.get(pk=item_id)
+        try:
+            item = Item.objects.get(pk=item_id)
+        except Item.DoesNotExist:
+            continue
         total_price += item.price * count
         ret_val.append({'item': item, 'count': count})
     return {'order': ret_val, 'price': total_price}
