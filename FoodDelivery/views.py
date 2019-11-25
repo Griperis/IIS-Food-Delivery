@@ -5,7 +5,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 
-import datetime
+from datetime import date, datetime, timedelta
 
 def index(request):
 
@@ -92,36 +92,71 @@ def operator(request, driver_id):
 
 def driver(request):
     context = { 'orders' : Order.objects.all().order_by('-date')[::-1],
-                'facilities' : Facility.objects.all() }
-    
-    if request.method == 'POST':
-        order_id = request.POST.get('order_id')
+                'facilities' : Facility.objects.all(),
+                'user' : request.user, 
+                'filter_state' : 'all',
+                'filter_facility' : 'all', 
+                'filter_date' : str(date.today()), }
 
+    if request.method == 'POST':
+        #get and save status of page
+        val = request.GET.get('filter_state')
+        if val != None and val != '':
+            context['filter_state'] = val
+        val = request.GET.get('filter_facility')
+        if val != None and val != '':
+            context['filter_facility'] = request.GET.get('filter_facility')
+        if val != None and val != '':
+            context['filter_date'] = request.GET.get('filter_date')
+
+        order_id = request.POST.get('order_id')
         if order_id != None:
             order = get_object_or_404(Order, pk=order_id)
             order.state = 'F'
             order.save()
     elif request.method == 'GET':
+        #get and save status of page
         filter_state = request.GET.get('filter_state')
+        if filter_state == None or filter_state == '':
+            filter_state = 'all'
+        context['filter_state'] = filter_state
         filter_facility = request.GET.get('filter_facility')
-        filter_date = request.GET.get('time')
-
-        if filter_state != None and filter_facility != None and filter_date != None:
-            if filter_date == '':
-                filter_date = datetime.date.today()
- 
-            print(filter_date) #TODO: debug
-
-            if filter_facility == 'all':
-                if filter_state != 'all':
-                    context['orders'] = Order.objects.filter(state=filter_state,date__gte=filter_date).order_by('-date')[::-1]
-                else:
-                    context['orders'] = Order.objects.filter(date__gte=filter_date).order_by('-date')[::-1]
+        if filter_facility == None or filter_facility == '':
+            filter_facility = 'all'
+        context['filter_facility'] = filter_facility
+        filter_date = request.GET.get('filter_date')
+        if filter_date == None or filter_date == '':
+            filter_date = str(date.today())
+        context['filter_date'] = filter_date
+        
+        end_date = datetime.strptime(filter_date, '%Y-%m-%d') + timedelta(days=1)
+        #use filters to show orders
+        if filter_facility == 'all':
+            if filter_state == 'all':
+                context['orders'] = Order.objects.filter(date__gte=filter_date,
+                                                        date__lt=end_date,
+                                                        handled_by=request.user.id).order_by('-date')[::-1]
             else:
-                if filter_state != 'all':
-                    context['orders'] = Order.objects.filter(state=filter_state, belongs_to=filter_facility,date__gte=filter_date).order_by('-date')[::-1]
-                elif filter_facility != None:
-                    context['orders'] = Order.objects.filter(belongs_to=filter_facility,date__gte=filter_date).order_by('-date')[::-1]
+                context['orders'] = Order.objects.filter(state=filter_state, 
+                                                        date__gte=filter_date,
+                                                        date__lte=end_date, 
+                                                        handled_by=request.user.id).order_by('-date')[::-1]
+        else:
+            if filter_state == 'all':
+                context['orders'] = Order.objects.filter(belongs_to=filter_facility, 
+                                                        date__gte=filter_date,
+                                                        date__lte=end_date, 
+                                                        handled_by=request.user.id).order_by('-date')[::-1]
+            else:
+                context['orders'] = Order.objects.filter(state=filter_state, 
+                                                        belongs_to=filter_facility,
+                                                        date__gte=filter_date,
+                                                        date__lte=end_date, 
+                                                        handled_by=request.user.id).order_by('-date')[::-1]
+
+    #convert string representation of facility_id to integer representation
+    if context['filter_facility'] != 'all':
+        context['filter_facility'] = int(context['filter_facility'])
 
     return render(request, 'app/driver.html', context)
 
