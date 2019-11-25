@@ -35,7 +35,7 @@ class Order(models.Model):
     ORDER_STATE = (
         ('A', 'ACCEPTED'),
         ('D', 'DELIVERING'),
-        ('F', 'FINISHED')
+        ('F', 'FINISHED'),
     )
     items = models.ManyToManyField(to=Item, through='OrderItem', through_fields=('order', 'item'))
     state = models.CharField(max_length=100, choices=ORDER_STATE, default=ORDER_STATE[0])
@@ -81,8 +81,6 @@ class Facility(models.Model):
     closing_time = models.TimeField(name='closing_time')
     state = models.CharField(max_length=20, choices=FACILITY_STATE)
     offers = models.ManyToManyField(to=Offer, blank=True)
-    min_price = models.IntegerField(default=0)
-
     
     def __str__(self):
         return self.name
