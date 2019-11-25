@@ -2,7 +2,7 @@
 
 {% load model_extras %}
 {% block content %}
-<div class="shadow container mt-5 pb-5">
+<div class="shadow container p-4">
     <h1>Provozovny</h1>
     <div class="d-flex flex-wrap facilities-list">
     {% for facility in facilities %}
@@ -15,7 +15,7 @@
             {% else %}
                 <p><i class="fas fa-circle offline-symbol"></i> Zavřeno</p>
             {% endif %}
-            <a class="btn btn-warning btn-block" href="{% url  'facility_detail' facility.id %}">Vybrat</a>
+            <a class="btn btn-warning btn-block" href="{% url 'facility_detail' facility.id %}">Vybrat</a>
         </div>
     {% endfor %}
     </div>  

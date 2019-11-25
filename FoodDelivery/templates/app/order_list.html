@@ -8,12 +8,13 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6 font-weight-bold">Stav objednávky:</div>
+                    
                     {% if order_data.order.state == "A" %}
-                        <div class="col-md-6 text-right text-success">Přijata</div>
+                        <div class="col-md-6 text-right text-success font-weight-bold">Přijata</div>
                     {% elif order_data.order.state == "D" %}
-                        <div class="col-md-6 text-right">Na cestě</div>
+                        <div class="col-md-6 text-right font-weight-bold">Na cestě</div>
                     {% elif order_data.order.state == "F" %}
-                        <div class="col-md-6 text-right">Doručena</div>
+                        <div class="col-md-6 text-right font-weight-bold">Doručena</div>
                     {% else%}
                         <div class="col-md-6 text-right">Neznámý</div>
                     {% endif %}
@@ -26,9 +27,9 @@
                 <li class="list-group-item">
                     <div class="row ">
                         <div class="col-sm-auto">
-                            <img style="height: 50" src="https://www.donantonio.cz/cache/40/16/4016bdbec2f9-59-336x250-centered_crop.jpg" class="img-fluid">
+                            <img style="height: 50px;" class="rounded" src="{% if item.item.img %}{{ item.item.img.url }}{% endif %}"
+                            onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'">
                         </div>
-                        <!--TODO: obrazek YAY or NAY?-->
                         <div class="col-sm-auto px-2">{{ item.count }}x </div>
                         <div class="col-sm-auto px-0  font-weight-bold">{{ item.item.name }}</div>
                         <div class="col text-right">á {{ item.item.price }} Kč</div>

@@ -73,7 +73,9 @@ def change_password(request):
                 return redirect(to='/login')
             return redirect(to='/user?pwdsuccess=0&tab=info')
 
-def filter_offers(facility, search_field, type_field):
+def filter_offers(facility, filter_form):
+    search_field = filter_form['search']
+    type_field = filter_form['type']
     offers = facility.offers.all()
     filtered_offers = {}
     for offer in offers:
@@ -100,7 +102,7 @@ def create_new_order(order_state, facility_id, user):
         oi.save()
         new_order.items.add(entry['item'])
     
-    return new_order.id
+    return new_order.pk
 
 def is_fac_open(facility):
     if facility.opening_time == facility.closing_time:
@@ -123,16 +125,24 @@ def facility_detail(request, facility_id):
 
         search_field = ''
         type_field = ''
+
         if request.GET.get('search'):
             search_field = request.GET['search']
         if request.GET.get('filter-type'):
             type_field = request.GET['filter-type']
+        
+        if search_field == '':
+            filter_form = load_form_state(request)
+        else:
+            filter_form = {'search': search_field, 'type': type_field}
 
-        search_form = {'search': search_field, 'type': type_field}
-        filtered_offers = filter_offers(facility, search_field, type_field)
+        if request.GET.get('submit'):
+            if request.GET['submit'] == 'remove_filter':
+                filter_form = {'type': '', 'search': ''}
+        filtered_offers = filter_offers(facility, filter_form)
 
         is_open = is_fac_open(facility)
-        context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}, 'search_form': search_form }
+        context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}, 'search_form': filter_form }
 
         order_summary = load_order_state(request, str(facility_id))
         if request.GET.get('add_item'):
@@ -149,16 +159,22 @@ def facility_detail(request, facility_id):
             context['can_order'] = False
 
         context['summary'] = order_summary
-        response = render(request, 'app/facility/facility_detail.html', context)
+        response = render(request, 'app/facility_detail.html', context)
         if (order_summary):
             save_order_state(response, order_summary['order'], str(facility_id))
+
+        if request.GET.get('submit'):
+            if request.GET['submit'] == 'remove_filter':
+                remove_form_state(response)
+            else:
+                save_form_state(response, filter_form)
         return response
 
 def order_summary(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
     order_items = OrderItem.objects.all().filter(order=order_id)
     order_data = {'order': order, 'items': order_items }
-    return render(request, 'app/order/order_summary.html', { 'order_data': order_data })
+    return render(request, 'app/order_summary.html', { 'order_data': order_data })
 
 def operator(request, driver_id):
     return render(request, 'app/operator.html')

@@ -21,16 +21,19 @@ html, body {
 }
 #wrapper {
     min-height: 100%;
-    margin-bottom: -130px;
-    padding-bottom: 130px;
+    margin-bottom: -40px;
+    padding-bottom: 40px;
 }
 
 .footer {
-    height: 130x;
+    height: 40px;
     padding: 5px;
     background: #292826;
     color: white;
     z-index: 1;
+}
+.text-half-alpha {
+    color: rgba(255,255,255, 0.5);
 }
 
 
