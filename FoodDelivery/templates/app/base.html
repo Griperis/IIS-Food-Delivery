@@ -33,10 +33,10 @@
                                 <i class="fas fa-user-shield"></i> Administrace
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                {% if user|has_group:"Driver" %}
+                                {% if user|has_group:"Driver" or user|has_group:"Operator" or user|has_group:"Administrator"%}
                                     <a class="dropdown-item" href="{% url 'driver' %}">Řidič</a>
                                 {% endif %}
-                                {% if user|has_group:"Operator" %}
+                                {% if user|has_group:"Operator" or user|has_group:"Administrator" %}
                                     <a class="dropdown-item" href="{% url 'operator' %}">Operátor</a>
                                 {% endif %}
                                 {% if user|has_group:"Administrator" %}
