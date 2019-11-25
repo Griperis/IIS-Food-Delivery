@@ -1,4 +1,6 @@
-  <p>Logged out!</p>  
-  <a href="{% url 'login'%}">Click here to login again.</a>
-  <br/>
-  <a href="{% url 'index'%}">Home.</a>
+{% extends 'app/base.html' %}
+{% block content %}
+<div class="text-center p-5">
+  <h3 >Odhlášení proběhlo úspěšně.</h3>
+</div>
+{% endblock %}
