@@ -19,7 +19,7 @@ html, body {
 .navbar-wrapper {
     z-index: 1;
 }
-.wrapper {
+#wrapper {
     min-height: 100%;
     margin-bottom: -130px;
     padding-bottom: 130px;
