@@ -13,6 +13,9 @@ urlpatterns = [
     path('driver/', views.driver, name='driver'),
     path('operator/', views.operator, name='operator'),
     path('custom_admin/', views.admin, name='custom_admin'),
+    path('admin_set_user_password', views.admin_set_user_password, name='admin_set_user_password'),
+    path('admin_create_user', views.admin_create_user, name='admin_create_user'),
+    path('delete_user', views.delete_user, name='delete_user'),
 ]
 
 # Authentication urls!

@@ -14,18 +14,19 @@
                 <input class="form-control" id="disabledInput" type="text" placeholder="{{ user.username }}" disabled>
             </p>
             {{ user_form.as_p }}
+            <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
             <input type="submit" class="btn btn-warning mb-2" value="Potvrdit změny">
         </form>
 
     </div>
-
-
+    
     <h3>Změna hesla</h3>
         {% if pwdsuccess == 1 %}
             <p class="font-weight-bold text-success">Heslo úspěšně změněno!</p>
         {% elif pwdsuccess == 0 %}
             <p class="font-weight-bold text-danger">Heslo nebylo změněno!</p>
         {% endif %}
+
     <form action="{% url 'change_password' %}" method="post">
         {% csrf_token %}
         {{ password_form.as_p }}
