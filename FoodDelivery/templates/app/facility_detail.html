@@ -2,117 +2,117 @@
 {% load model_extras %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-1 ml-5 mr-5">
-            {% comment %} Facility info {% endcomment %}
-            <div class="shadow p-4 mb-5">
-                <h3 class="text-truncate">Provozovna: {{ facility.name }}</h3>
-                <p class="text-truncate"><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
-                <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility|print_opening_hours }}</p>
-                {% if facility|fac_is_open %}
-                    <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
-                    {% if facility.state == 'A' %}
-                        <p><i class="fas fa-circle online-symbol"></i> Příjmá objednávky</p>
-                    {% elif facility.state == 'D' %}
-                        <p><i class="fas fa-circle offline-symbol"></i> Nepříjmá objednávky</p>
-                    {% endif %}
-                {% else %}
-                    <p><i class="fas fa-circle offline-symbol"></i> Zavřeno</p>
+<div class="fd-detail ml-5">
+        {% comment %} Facility info {% endcomment %}
+        <div class="shadow p-4 mb-5">
+            <h3 class="text-truncate">Provozovna: {{ facility.name }}</h3>
+            <p class="text-truncate"><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
+            <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility|print_opening_hours }}</p>
+            {% if facility|fac_is_open %}
+                <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
+                {% if facility.state == 'A' %}
+                    <p><i class="fas fa-circle online-symbol"></i> Příjmá objednávky</p>
+                {% elif facility.state == 'D' %}
+                    <p><i class="fas fa-circle offline-symbol"></i> Nepříjmá objednávky</p>
                 {% endif %}
+            {% else %}
+                <p><i class="fas fa-circle offline-symbol"></i> Zavřeno</p>
+            {% endif %}
+        </div>
+        {% comment %} Offer display {% endcomment %}
+        <div class="shadow p-4">
+            <h2 class="mb-0">Aktuální nabídka</h2>
+            <div class="shadow p-2 mt-3 bg-white rounded fd-search">
+                <form class="form-inline mb-0 reload-scroll-back" method="GET">
+                    <h4 class="mr-auto mb-0">Filtrovat</h4>
+                    {% if search_form.search != '' %}
+                        <button class="btn close mr-2" type="submit" name="submit" value="remove_filter">&times;</button>
+                    {% endif %}
+                    <!-- <label class="mr-2">
+                        <span class="mr-2">
+                            Typ nabídky:
+                        </span>
+                        <input type="checkbox" value="1" name="daily" {% if search_form.daily %} checked {% endif %}> Denní
+                    </label>
+                    <label class="mr-2">
+                        <input type="checkbox" value="1" name="permanent" {% if search_form.permanent %} checked {% endif %}> Stálá
+                    </label> -->
+                    <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
+                    <select name="filter_type" class="form-control mr-2">
+                        <option value="name" {% if search_form.type == 'name' %} selected {% endif %}>Jméno</option>
+                        <option value="type" {% if search_form.type == 'type' %} selected {% endif %}>Typ</option>
+                    </select>
+                    <button class="btn btn-warning" type="submit" name="submit" value="search">Hledat <i class="fas fa-search"></i></button>
+                </form>
             </div>
-            {% comment %} Offer display {% endcomment %}
-            <div class="shadow p-4">
-                <h2 class="mb-0">Aktuální nabídka</h2>
-                <div class="shadow p-2 mt-3 bg-white sticky-top rounded fd-search">
-                    <form class="form-inline mb-0 reload-scroll-back" method="GET">
-                        <h4 class="mr-auto mb-0">Filtrovat</h4>
-                        {% if search_form.search != '' %}
-                            <button class="btn close mr-2" type="submit" name="submit" value="remove_filter">&times;</button>
-                        {% endif %}
-                        <!-- <label class="mr-2">
-                            <span class="mr-2">
-                                Typ nabídky:
-                            </span>
-                            <input type="checkbox" value="1" name="daily" {% if search_form.daily %} checked {% endif %}> Denní
-                        </label>
-                        <label class="mr-2">
-                            <input type="checkbox" value="1" name="permanent" {% if search_form.permanent %} checked {% endif %}> Stálá
-                        </label> -->
-                        <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
-                        <select name="filter_type" class="form-control mr-2">
-                            <option value="name" {% if search_form.type == 'name' %} selected {% endif %}>Jméno</option>
-                            <option value="type" {% if search_form.type == 'type' %} selected {% endif %}>Typ</option>
-                        </select>
-                        <button class="btn btn-warning" type="submit" name="submit" value="search">Hledat <i class="fas fa-search"></i></button>
-                    </form>
-                </div>
-                {% for offer in offers.values %}
-                <div class="fd-offer-container">
-                    <h3>{{ offer.name }} - {% if offer.variant == 'P' %}Stálá nabídka{% elif offer.variant == 'D'%}Denní nabídka{% endif %}</h3>
-                    <div class="d-flex flex-wrap">
-                    {% for item in offer.items %}
-                        <div class="shadow m-2 p-2">
-                        {% comment %} Image with no image available picture when item.img is not set {% endcomment %}
-                        <img style="height: 200px;" class="rounded" src="{% if item.img %}{{ item.img.url }}{% endif %}"
-                            onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'">
-                        <div class="mt-2">
-                            <h4>{{ item.name }}</h4>
-                            {% if item.variant != '' %}<p>Typ: {{ item.variant }}</p>{% endif %}
-                            {% if item.volume %}<p>Objem: {{ item.volume }} ml</p>{% endif %}
-                            {% if item.weight %}<p>Hmotnost: {{ item.weight }} g</p>{% endif %}
-                            {% if item.ingredients %}<p>Složení: {{ item.ingredients }}</p>{% endif %}
+            {% for offer in offers.values %}
+            <div class="mt-4">
+                <h3>{{ offer.name }} - {% if offer.variant == 'P' %}Stálá nabídka{% elif offer.variant == 'D'%}Denní nabídka{% endif %}</h3>
+                <div class="d-flex flex-wrap">
+                {% for item in offer.items %}
+                    <div class="shadow m-2 p-2">
+                    {% comment %} Image with no image available picture when item.img is not set {% endcomment %}
+                    <img style="width: 300px;" class="rounded" src="{% if item.img %}{{ item.img.url }}{% endif %}"
+                        onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'">
+                    <div class="mt-2 fd-item-card">
+                        <h4>{{ item.name }}</h4>
+                        {% if item.variant != '' %}<p>Typ: {{ item.variant }}</p>{% endif %}
+                        {% if item.volume %}<p>Objem: {{ item.volume }} ml</p>{% endif %}
+                        {% if item.weight %}<p>Hmotnost: {{ item.weight }} g</p>{% endif %}
+                        {% if item.ingredients %}<p>Složení: {{ item.ingredients }}</p>{% endif %}
+                        <div class="">
                             <p>Cena: {{ item.price }} Kč</p>
                             {% if not item.in_stock %}&times; Momentálně nedostupné{% endif %}
                             <form method="GET" action="" class="reload-scroll-back">
                                 <button type="submit" class="btn btn-warning mt-auto" name="add_item" 
                                 value="{{ item.pk }}" {% if not item.in_stock or not facility|fac_is_open or facility.state == 'D' %} disabled {% endif %}>Přidat</button>
                             </form>
-                            </div>
                         </div>
-                    {% empty %}
-                        Žádné pokrmy v této nabídce neodpovídají zadanému výrazu
-                    {% endfor %}
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        {% comment %} Order summary {% endcomment %}
-        <div class="col-2 shadow fd-summary-container">
-            <h3>Shrnutí objednávky</h3>
-            <div class="fd-summary-items">
-                {% for entry in summary.order %}
-                    {{ entry.count }}x {{ entry.item.name }}
-                    <form method="GET" class="reload-scroll-back">
-                        <button type="submit" class="btn btn-warning" name="remove_item" value="{{ entry.item.pk }}">Odebrat</button>
-                    </form>
                 {% empty %}
-                Žádné položky
+                    Žádné pokrmy v této nabídce neodpovídají zadanému výrazu
                 {% endfor %}
-            </div>
-            <p>Cena celkem: {{ summary.price }} Kč</p>
-            {% if user.is_authenticated and summary.price >= facility.min_price %}
-                <form method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-warning btn-block" name="order" {% if not can_order %} disabled {% endif %}>Objednat</button>
-                </form>
-            {% elif not user.is_authenticated %}
-                Pro objednání musíte být přihlášen nebo zaregistrován
-                <div class="btn-group mt-2">
-                    <a href="{% url 'register' %}?next={{ request.path }}" class="btn btn-warning">
-                        <i class="fas fa-user-plus"></i> Registrace
-                    </a>
-                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-warning">
-                        <i class="fas fa-sign-in-alt"></i> Přihlášení
-                    </a>
                 </div>
-            {% else %}
-                Minimální cena objednávky: <br>
-                {{ facility.min_price }} Kč
-            {% endif %}
+            </div>
+        {% endfor %}
         </div>
     </div>
+</div>
+
+{% comment %} Order summary {% endcomment %}
+<div class="fd-summary p-4 shadow rounded-lg">
+    <h3>Shrnutí objednávky</h3>
+    <div class="fd-summary-items">
+        {% for entry in summary.order %}
+            {{ entry.count }}x {{ entry.item.name }}
+            <form method="GET" class="reload-scroll-back">
+                <button type="submit" class="btn btn-warning" name="remove_item" value="{{ entry.item.pk }}">Odebrat</button>
+            </form>
+        {% empty %}
+        Žádné položky
+        {% endfor %}
+    </div>
+    <p>Cena celkem: {{ summary.price }} Kč</p>
+    {% if user.is_authenticated and summary.price >= facility.min_price %}
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning btn-block" name="order" {% if not can_order %} disabled {% endif %}>Objednat</button>
+        </form>
+    {% elif not user.is_authenticated %}
+        Pro objednání musíte být přihlášen nebo zaregistrován
+        <div class="btn-group mt-2">
+            <a href="{% url 'register' %}?next={{ request.path }}" class="btn btn-warning">
+                <i class="fas fa-user-plus"></i> Registrace
+            </a>
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-warning">
+                <i class="fas fa-sign-in-alt"></i> Přihlášení
+            </a>
+        </div>
+    {% else %}
+        <p>Minimální cena objednávky: <br>
+        {{ facility.min_price }} Kč
+        </p>
+    {% endif %}
 </div>
 {% endblock %}
