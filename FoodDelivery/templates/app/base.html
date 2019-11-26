@@ -21,7 +21,7 @@
 <body>
     <div id="wrapper">
         <nav class="navbar navbar-expand-lg navbar-dark background-dark shadow">
-            <a class="navbar-brand" href="#">Rozvoz jídel</a>
+            <a class="navbar-brand" href="{% url 'index' %}">Rozvoz jídel</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -76,13 +76,16 @@
                 </ul>
             </div>
         </nav>
-        {% block content %}
-        {% endblock %}
+        <div class="pb-5 pt-5">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
-    <footer class="footer shadow">
-        <p>Adresa firmy: ABC v DEF 123 45</p>
-        <p>Telefon: 123 456 789</p>
-        <p>It is {% now "jS F Y H:i" %}</p>
+    <footer class="footer shadow text-half-alpha">
+        <p class="p-1 pb-2">
+            <span class="float-left">@Rozvoz jídel</span>
+            <span class="float-right">©IIS Projekt - Zdeněk Doležal, Marek Nesvadba, David Mikšaník</span>
+        </p>
     </footer>
 
 </body>

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from polymorphic.models import PolymorphicModel
 
-class Item(models.Model):
+class Item(PolymorphicModel):
     name = models.CharField(max_length=100)
     variant = models.CharField(max_length=200, blank=True)
     img = models.ImageField(null=True, blank=True)

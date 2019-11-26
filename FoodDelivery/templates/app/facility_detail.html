@@ -1,5 +1,6 @@
 {% extends 'app/base.html'%}
 {% load model_extras %}
+
 {% block content %}
 <div class="fd-summary-container rounded shadow-lg">
     <h3>Shrnutí objednávky</h3>
@@ -17,22 +18,26 @@
     {% if user.is_authenticated and summary.price >= facility.min_price %}
         <form method="POST">
             {% csrf_token %}
-            <button type="submit" class="btn btn-warning btn-block" {% if not can_order %} disabled {% endif %}>Objednat</button>
+            <button type="submit" class="btn btn-warning btn-block" name="order" {% if not can_order %} disabled {% endif %}>Objednat</button>
         </form>
     {% elif not user.is_authenticated %}
         Pro objednání musíte být přihlášen nebo zaregistrován
-        <div class="btn-group">
-            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-warning">Přihlásit se</a>
-            <a href="{% url 'register' %}?next={{ request.path }}" class="btn btn-warning">Registrovat se</a>
+        <div class="btn-group mt-2">
+            <a href="{% url 'register' %}?next={{ request.path }}" class="btn btn-warning">
+                <i class="fas fa-user-plus"></i> Registrace
+            </a>
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-warning">
+                <i class="fas fa-sign-in-alt"></i> Přihlášení
+            </a>
         </div>
     {% else %}
         Minimální cena objednávky: <br>
         {{ facility.min_price }} Kč
     {% endif %}
 </div>
-<div class="container mt-5 shadow ml-5 p-4">
-    <h3>Provozovna: {{ facility.name }}</h3>
-    <p><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
+<div class="container shadow mb-5 ml-5 p-4">
+    <h3 class="text-truncate">Provozovna: {{ facility.name }}</h3>
+    <p class="text-truncate"><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
     <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility|print_opening_hours }}</p>
     {% if facility|fac_is_open %}
         <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
@@ -46,16 +51,27 @@
     {% endif %}
 
 </div>
-<div class="container mb-5 pb-4 ml-5 shadow p-4">
-    <form class="form-inline mt-3" method="GET">
-        <h2 class="mr-auto">Aktuální nabídka</h2>
-        <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
-        <select name="filter-type" class="form-control mr-2">
-            <option value="name" {% if search_form.type == 'name' %} selected {% endif %}>Jméno</option>
-            <option value="type" {% if search_form.type == 'type' %} selected {% endif %}>Typ</option>
-        </select>
-        <button class="btn btn-warning" type="submit">Hledat <i class="fas fa-search"></i></button>
-    </form>
+<div class="container ml-5 shadow p-4">
+    <div class="shadow p-2 mt-3 bg-white sticky-top rounded">
+        <form class="form-inline mb-0 reload-scroll-back" method="GET">
+            <h2 class="mr-auto mb-0">Aktuální nabídka</h2>
+            {% if search_form.search != '' %}
+                <button class="btn close mr-2" type="submit" name="submit" value="remove_filter">&times;</button>
+            {% endif %}
+            <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
+            <select name="filter_type" class="form-control mr-2">
+                <option value="name" {% if search_form.type == 'name' %} selected {% endif %}>Jméno</option>
+                <option value="type" {% if search_form.type == 'type' %} selected {% endif %}>Typ</option>
+            </select>
+            <!-- <label class="mr-2">
+                <input type="checkbox" value="1" name="daily" {% if search_form.daily %} checked {% endif %}> Denní nabídky
+            </label>
+            <label class="mr-2">
+                <input type="checkbox" value="1" name="permanent" {% if search_form.permanent %} checked {% endif %}> Stálé nabídky
+            </label> -->
+            <button class="btn btn-warning" type="submit" name="submit" value="search">Hledat <i class="fas fa-search"></i></button>
+        </form>
+    </div>
     {% for offer in offers.values %}
     <div class="fd-offer-container">
         <h3>{{ offer.name }} - {% if offer.variant == 'P' %}Stálá nabídka{% elif offer.variant == 'D'%}Denní nabídka{% endif %}</h3>
@@ -68,7 +84,9 @@
             <div class="mt-2">
                 <h4>{{ item.name }}</h4>
                 {% if item.variant != '' %}<p>Typ: {{ item.variant }}</p>{% endif %}
-                {% if item.volume %}<p>Objem: {{ item.volume }}</p> {% endif %}
+                {% if item.volume %}<p>Objem: {{ item.volume }} ml</p>{% endif %}
+                {% if item.weight %}<p>Hmotnost: {{ item.weight }} g</p>{% endif %}
+                {% if item.ingredients %}<p>Složení: {{ item.ingredients }}</p>{% endif %}
                 <p>Cena: {{ item.price }} Kč</p>
                 {% if not item.in_stock %}&times; Momentálně nedostupné{% endif %}
                 <form method="GET" action="" class="reload-scroll-back">

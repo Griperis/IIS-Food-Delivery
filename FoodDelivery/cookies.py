@@ -59,9 +59,24 @@ def save_order_state(response, order_state, facility_id):
     to_serialize = {facility_id: {}}
     for entry in order_state:
         to_serialize[facility_id][str(entry['item'].pk)] = entry['count']
-    response.set_cookie('order_state', json.dumps(to_serialize), expires=datetime.datetime.now() + datetime.timedelta(seconds=600))
+    response.set_cookie('order_state', json.dumps(to_serialize), max_age=300)
 
 def remove_order_cookies(response):
     response.delete_cookie('order_state')
+
+def save_form_state(response, form_state):
+    response.set_cookie('form_state', json.dumps(form_state), max_age=300)
+
+def remove_form_state(response):
+    response.delete_cookie('form_state')
+
+def load_form_state(request):
+    form_state = request.COOKIES.get('form_state')
+    if form_state is None:
+        return {'type': '', 'search': ''}
+    else:
+        form_state = json.loads(form_state)
+        print(form_state)
+        return form_state
 
 
