@@ -34,7 +34,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'FoodDelivery.apps.FoodDeliveryConfig',
     'django.contrib.admin',
-    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django.contrib.auth',
     'django.contrib.sessions',
@@ -46,7 +45,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

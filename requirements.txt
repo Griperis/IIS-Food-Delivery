@@ -4,5 +4,4 @@ django-storages
 django-heroku
 boto3
 gunicorn
-whitenoise
 Pillow
