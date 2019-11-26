@@ -2,16 +2,19 @@
     position: sticky;
     min-height: 400px;
     max-width: 260px;
+    height: 50%;
     z-index: 1;
     top: 30%;
     float: right;
     background: #292826;
     color: white;
-    padding: 10px;
 }
 .fd-summary-items {
     max-height: 300px;
     overflow-y: auto;
+}
+.fd-search {
+    top: 8%;
 }
 .fd-offer-container {
     margin-top: 30px;
