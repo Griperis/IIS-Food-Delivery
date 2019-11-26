@@ -23,15 +23,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'kqme0zg59r=a^_ber$ac)o0$o4plfl%7z$_pg0d4-a^+sug!jh'
 
-# AWS S3 Part
-AWS_ACCESS_KEY_ID = 'AKIAIEIJS7VJSIAWFUXA'
-AWS_SECRET_ACCESS_KEY = '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'
-
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_STORAGE_BUCKET_NAME = 'iis-fd' 
-AWS_S3_REGION_NAME = 'eu-central-1'
-AWS_DEFAULT_ACL = None
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -43,7 +34,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'FoodDelivery.apps.FoodDeliveryConfig',
     'django.contrib.admin',
-    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django.contrib.auth',
     'django.contrib.sessions',
@@ -55,7 +45,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -134,15 +123,24 @@ LANGUAGE_CODE = 'cz'
 
 TIME_ZONE = 'Europe/Prague'
 
+# AWS S3 Part
+AWS_ACCESS_KEY_ID = 'AKIAIEIJS7VJSIAWFUXA'
+AWS_SECRET_ACCESS_KEY = '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'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_STORAGE_BUCKET_NAME = 'iis-fd' 
+AWS_S3_REGION_NAME = 'eu-central-1'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME, AWS_S3_REGION_NAME) 
+
+AWS_DEFAULT_ACL = None
+AWS_LOCATION = 'media'
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
-
-MEDIA_URL = 'https://iis-fd.s3.eu-central-1.amazonaws.com/'
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 
 django_heroku.settings(locals())
 
