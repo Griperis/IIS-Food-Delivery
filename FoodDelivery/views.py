@@ -303,7 +303,3 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return render(request, 'authentication/logged_out.html')
-
-def aws_debug(request):
-    items = Item.objects.all()
-    return render(request, 'app/aws_debug.html', {'items': items })

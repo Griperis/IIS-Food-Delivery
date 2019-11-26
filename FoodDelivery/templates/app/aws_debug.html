@@ -1,8 +1,0 @@
-{% extends 'app/base.html' %}
-{% block content %}
-<div class="container">
-    {% for item in items %}
-        <img style="height: 50px;" src="{% if item.img %}{{ item.img.url }}{% endif %}">
-    {% endfor %}
-</div>
-{% endblock %}

@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'FoodDelivery.apps.FoodDeliveryConfig',
     'django.contrib.admin',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django.contrib.auth',
     'django.contrib.sessions',
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -132,7 +134,6 @@ AWS_STORAGE_BUCKET_NAME = 'iis-fd'
 AWS_S3_REGION_NAME = 'eu-central-1'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME, AWS_S3_REGION_NAME) 
 
-AWS_DEFAULT_ACL = None
 AWS_LOCATION = 'media'
 
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
