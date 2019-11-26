@@ -13,7 +13,8 @@ urlpatterns = [
     path('order/<int:order_id>', views.order_summary, name='order_summary'),
     path('driver/', views.driver, name='driver'),
     path('operator/', views.operator, name='operator'),
-    path('custom_admin/', views.admin, name='custom_admin')
+    path('custom_admin/', views.admin, name='custom_admin'),
+    path('aws_debug/', views.aws_debug, name='aws_debug')
 ]
 
 # Authentication urls!
