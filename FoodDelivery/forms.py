@@ -85,3 +85,4 @@ class CustomAuthenticationForm(AuthenticationForm):
     username = UsernameField(label=_("Uživatelské jméno"),widget=forms.TextInput(attrs={'autofocus': True, 'class': 'form-control'}))
     password = forms.CharField(label=_("Heslo"),strip=False,widget=forms.PasswordInput(attrs={'class': 'form-control'}),)
     error_messages = {'invalid_login': _("Špatné uživatelské jméno nebo heslo."),'inactive': _("Tento účet je neaktivní."),}
+    
