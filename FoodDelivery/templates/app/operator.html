@@ -1,1 +1,118 @@
-OPERATOR
+{% extends 'app/base.html' %}
+{% load auth_extras %}
+
+{% block content %}
+
+<div class="row w-75 pt-2 mx-auto" >
+    <div class="col-sm">
+
+{% if user.is_authenticated %}
+    {% if user|has_group:'Operator' or user|has_group:'Administrator' %}
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="nav-facilities-tab" data-toggle="tab" href="#nav-facilities" role="tab" aria-controls="nav-facilities" aria-selected="true">Zařízení</a>
+                <a class="nav-item nav-link" id="nav-offers-tab" data-toggle="tab" href="#nav-offers" role="tab" aria-controls="nav-offers" aria-selected="false">Nabídky</a>
+            </div>
+        </nav>
+
+        <div class="tab-content" id="nav-tabContent">
+            {# --- facilities --- #}
+            <div class="tab-pane fade show active" id="nav-facilities" role="tabpanel" aria-labelledby="nav-orders-tab">
+            <h3>Změna údajů zařízení</h3>
+
+            {# find facility #}
+            <form action="#" method="get">
+                <p><label for="select">Výběr zařízení:</label>
+                <select id="select" class="form-control" onchange="if(this.value != '0') window.location.href = '?selected_facility=' +  this.value;">
+                    <option value="0">Zařézení</option>
+                    {% for fac in facilities %}
+                        <option value="{{ fac.name }}" {% if fac.name == selected_facility.name %} selected {% endif %}>{{ fac.name }}</option>
+                    {% endfor %}
+                </select></p>
+            </form>
+
+            {# delete facility #}
+            {% if facility_deleted == '0' %}
+                <p class="font-weight-bold text-success">Zařízení vymazáno!</p>
+            {% elif facility_delted == '1' %}
+                <p class="font-weight-bold text-danger">Chyba při mazání zařízení!</p>
+            {% endif %}
+
+            <form action="{% url 'delete_facility' %}" method="POST"> {% csrf_token %}
+                <input type="hidden" name="name" value="{{ selected_facility.name }}"/>
+                <input type="hidden" name="next_url" value="{{ request.path }}"/>
+                <input type="submit" class="btn btn-danger mb-2" value="Smazat uživatele"/>
+            </form> 
+
+            {# change facility #}
+            <div class="pt-2">
+                <form action="{% url 'edit_facility' %}" method="POST"> {% csrf_token %}
+                    <p>
+                        <label for="disabledInput">Jméno zařízení:</label>
+                        <input class="form-control" id="disabledInput" type="text" placeholder="{{ selected_facility.name }}" disabled>
+                    </p>
+                    {{ fac_form.as_p }}
+
+                    {% if facility_changed == '0' %}
+                        <p class="font-weight-bold text-success">Hodnoty úspěšně změněny!</p>
+                    {% elif facility_changed == '1' %}
+                        <p class="font-weight-bold text-danger">Hodnoty nebyly změněny, špatný formát v některém poli!</p>
+                    {% endif %}
+
+                    <input type="hidden" name="name" value="{{ selected_facility.name }}"/>
+                    <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
+                    <input type="submit" class="btn btn-warning mb-2" value="Potvrdit změny"/>
+                </form>
+            </div>
+    
+            {# create new facility #}
+            <div class="col-sm">
+                <div>
+                    <h3>Vytvoření nového zařízení</h3>
+                    <form action="{% url 'create_facility' %}" method="POST"> {% csrf_token %}
+                        <p>
+                            <label for="new_facility_name">Jméno zařízení:</label>
+                            <input type="text" name="new_facility_name" class="form-control" required="" >
+                        </p>
+                        <p>
+                            <label for="new_facility_address">Adresa:</label>
+                            <input type="text" name="new_facility_address" class="form-control" required="" >
+                        </p>
+                        <input type="hidden" name="next_url" value="{{ request.path }}"/>
+
+                        {# write out the details of operation #}
+                        {% if new_facility == "0" %}
+                            <p class="font-weight-bold text-success">Zařízení vytvořeno!</p>
+                        {% elif new_facility == "1" %}
+                            <p class="font-weight-bold text-danger">Chyba při vytváření zařízení!</p>
+                        {% elif new_facility == "2" %}
+                            <p class="font-weight-bold text-danger">Zařízení už existuje!</p>
+                        {% endif %}
+
+                        <input type="submit" class="btn btn-warning mb-2" value="Vytvořit zařízení">
+                    </form>
+                </div>
+            </div>
+        
+            </div>
+
+            {# --- offers --- #}
+            <div class="tab-pane fade" id="nav-offers" role="tabpanel" aria-labelledby="nav-orders-tab">
+                <h3>Změna údajů nabídek</h3>
+            </div>
+        </div>
+        
+
+    {% else %}
+        <p>Tato stránka je pouze pro operátory!</p>
+        <a href="{% url 'index' %}" > zpět </a><br>
+    {% endif %}
+{% else %}
+    <p>Musíte se nejdřív přihlásit!</p>
+    <a href="{% url 'login' %}" > přihlasit se </a><br>
+{% endif %}
+
+</div>
+</div>
+
+{% endblock  %}

@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, FacilityChangeForm
 from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 
 from datetime import date, datetime, timedelta
+from django.utils import timezone
 
 def index(request):
 
@@ -87,11 +88,99 @@ def facility_detail(request, facility_id):
         facility = get_object_or_404(Facility, pk=facility_id)
         return render(request, 'app/facility/facility_detail.html', {'facility': facility})
 
-def operator(request, driver_id):
-    return render(request, 'app/operator.html')
+def operator(request):
+    #set default values
+    facility_form = FacilityChangeForm()
+    selected_facility = None
+    facility_deleted = '-1'
+    facility_changed = '-1'
+    new_facility = '-1'
+
+    if request.method == 'GET':
+        name = request.GET.get('selected_facility', '')
+        facility_deleted = request.GET.get('facility_deleted', '')
+        facility_changed = request.GET.get('facility_changed', '')
+        new_facility = request.GET.get('new_facility', '')
+
+        if name != '':
+            selected_facility = Facility.objects.get(name = name)
+            facility_form = FacilityChangeForm(initial={ 'name' : selected_facility.name, 'address' : selected_facility.address, 'opening_time': selected_facility.opening_time,
+                                                    'closing_time' : selected_facility.closing_time, 'state' : selected_facility.state, }) #'offers' : selected_fac.offers })
+
+
+    if request.method == 'POST':
+        fac_form = FacilityChangeForm(request.POST, instance=request.user)
+
+    #send data
+    context = { 'user' : request.user,
+                'facilities' : Facility.objects.all(),
+                'selected_facility' : selected_facility,
+                'facility_deleted' : facility_deleted,
+                'facility_changed' : facility_changed,
+                'new_facility' : new_facility, 
+                'fac_form' : facility_form, }
+    return render(request, 'app/operator.html', context)
+
+def create_facility(request):
+    code = '1'
+    if request.method == 'POST':
+        next_url = request.POST.get('next_url', '/')
+        new_name = request.POST.get('new_facility_name')
+        new_address = request.POST.get('new_facility_address')
+
+        print(new_name)
+        print(new_address)
+
+        new_facility = Facility(name=new_name, address=new_address, opening_time=timezone.now(), closing_time=timezone.now(), state='D')
+        
+        #try:
+        new_facility.save()
+        print('OK')
+        code = '0'
+    #except Exception:
+    #    print('fail')
+    #    code = '2'
+
+    return redirect(to = next_url + '?new_facility=' + code)
+
+def edit_facility(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name')
+
+    if name != None:
+        facility = Facility.objects.get(name = name)
+
+    if facility != None:
+        if request.method == 'POST':
+            facility_form = FacilityChangeForm(request.POST, instance = request.user)
+
+            if facility_form.is_valid():
+                code = 0
+
+                facility.address = facility_form.cleaned_data.get('address')
+                facility.opening_time = facility_form.cleaned_data.get('opening_time')
+                facility.closing_time = facility_form.cleaned_data.get('closing_time')
+                facility.state = facility_form.cleaned_data.get('state')
+                facility.save()
+            else:
+                code = 1
+        
+            return redirect(to = next_url + '&facility_changed=' + code)
+
+def delete_facility(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name', '')
+
+    code = '1'
+    if name != '':
+        facility_to_delete = Facility.objects.get(name='name')
+        facility_to_delete.delete()
+        code = '0'
+
+    return redirect(to = next_url + '?facility_deleted=' + code)
 
 def driver(request):
-    context = { 'orders' : Order.objects.all().order_by('-date')[::-1],
+    context = { 'orders' : Order.objects.filter(handled_by=request.user.id).order_by('-date')[::-1],
                 'facilities' : Facility.objects.all(),
                 'user' : request.user, 
                 'filter_state' : 'all',

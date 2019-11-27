@@ -12,7 +12,11 @@ urlpatterns = [
     path('facility/<int:facility_id>', views.facility_detail, name='facility_detail'),
     path('driver/', views.driver, name='driver'),
     path('operator/', views.operator, name='operator'),
-    path('custom_admin/', views.admin, name='custom_admin')
+    path('custom_admin/', views.admin, name='custom_admin'),
+
+    path('create_facility', views.create_facility, name='create_facility'),
+    path('edit_facility', views.edit_facility, name='edit_facility'),
+    path('delete_facility', views.delete_facility, name='delete_facility'),
 ]
 
 # Authentication urls!

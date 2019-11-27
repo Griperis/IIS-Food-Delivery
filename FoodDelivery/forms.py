@@ -15,3 +15,11 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = CustomUser
         fields = ('email', 'first_name', 'last_name', 'address', 'phone')
+
+
+class FacilityChangeForm(forms.ModelForm):
+
+    class Meta:
+        model = Facility
+        fields = ('name', 'address', 'opening_time', 'closing_time', 'state', 'offers')
+
