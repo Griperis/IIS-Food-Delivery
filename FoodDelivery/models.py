@@ -67,8 +67,10 @@ class Offer(models.Model):
     items = models.ManyToManyField(Item, blank=True)
     
     def __str__(self):
-        return 'pk: ' + str(self.pk) + ' variant: ' + str(self.variant)
-
+        if (self.variant == 'D'):
+            return self.name + ' [denní, varianta: ' + str(self.pk) + ']'
+        else:
+            return self.name + ' [stála, varianta: ' + str(self.pk) + ']'
 
 class Facility(models.Model):
     FACILITY_STATE = (

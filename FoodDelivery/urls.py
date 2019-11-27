@@ -13,10 +13,17 @@ urlpatterns = [
     path('driver/', views.driver, name='driver'),
     path('operator/', views.operator, name='operator'),
     path('custom_admin/', views.admin, name='custom_admin'),
+    path('admin_set_user_password', views.admin_set_user_password, name='admin_set_user_password'),
+    path('admin_create_user', views.admin_create_user, name='admin_create_user'),
+    path('delete_user', views.delete_user, name='delete_user'),
 
-    path('create_facility', views.create_facility, name='create_facility'),
-    path('edit_facility', views.edit_facility, name='edit_facility'),
-    path('delete_facility', views.delete_facility, name='delete_facility'),
+    path('create_facility/', views.create_facility, name='create_facility'),
+    path('edit_facility/', views.edit_facility, name='edit_facility'),
+    path('delete_facility/', views.delete_facility, name='delete_facility'),
+
+    path('create_offer/', views.create_offer, name='create_offer'),
+    path('edit_offer/', views.edit_offer, name='edit_offer'),
+    path('delete_offer/', views.delete_offer, name='delete_offer'),
 ]
 
 # Authentication urls!

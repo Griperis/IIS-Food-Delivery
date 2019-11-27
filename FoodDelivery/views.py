@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, loader, HttpResponseRedirect, reverse
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
-from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm, CustomAuthenticationForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm, CustomAuthenticationForm, FacilityChangeForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
 from django.utils import timezone
@@ -216,19 +216,19 @@ def operator(request):
     new_facility = '-1'
 
     if request.method == 'GET':
-        name = request.GET.get('selected_facility', '')
+        name_facility = request.GET.get('selected_facility', '')
         facility_deleted = request.GET.get('facility_deleted', '')
         facility_changed = request.GET.get('facility_changed', '')
         new_facility = request.GET.get('new_facility', '')
 
-        if name != '':
-            selected_facility = Facility.objects.get(name = name)
+        if name_facility != '':
+            selected_facility = Facility.objects.get(name = name_facility)
             facility_form = FacilityChangeForm(initial={ 'name' : selected_facility.name, 'address' : selected_facility.address, 'opening_time': selected_facility.opening_time,
-                                                    'closing_time' : selected_facility.closing_time, 'state' : selected_facility.state, }) #'offers' : selected_fac.offers })
-
+                                                    'closing_time' : selected_facility.closing_time, 'state' : selected_facility.state,
+                                                    'offers' : selected_facility.offers.all() })
 
     if request.method == 'POST':
-        fac_form = FacilityChangeForm(request.POST, instance=request.user)
+        facility_form = FacilityChangeForm(request.POST, instance=request.user)
 
     #send data
     context = { 'user' : request.user,
@@ -247,18 +247,12 @@ def create_facility(request):
         new_name = request.POST.get('new_facility_name')
         new_address = request.POST.get('new_facility_address')
 
-        print(new_name)
-        print(new_address)
-
-        new_facility = Facility(name=new_name, address=new_address, opening_time=timezone.now(), closing_time=timezone.now(), state='D')
-        
-        #try:
-        new_facility.save()
-        print('OK')
-        code = '0'
-    #except Exception:
-    #    print('fail')
-    #    code = '2'
+        new_facility = Facility(name=new_name, address=new_address, opening_time=timezone.now(), closing_time=timezone.now(), state='D')        
+        try:
+            new_facility.save()
+            code = '0'
+        except Exception:
+            code = '2'
 
     return redirect(to = next_url + '?new_facility=' + code)
 
@@ -267,23 +261,29 @@ def edit_facility(request):
     name = request.POST.get('name')
 
     if name != None:
-        facility = Facility.objects.get(name = name)
+        facility = Facility.objects.get(name=name)
 
     if facility != None:
         if request.method == 'POST':
             facility_form = FacilityChangeForm(request.POST, instance = request.user)
 
             if facility_form.is_valid():
-                code = 0
+                code = '0'
 
                 facility.address = facility_form.cleaned_data.get('address')
                 facility.opening_time = facility_form.cleaned_data.get('opening_time')
                 facility.closing_time = facility_form.cleaned_data.get('closing_time')
                 facility.state = facility_form.cleaned_data.get('state')
+                facility.offers.set(facility_form.cleaned_data.get('offers'))
                 facility.save()
             else:
-                code = 1
+                code = '1'
         
+            # do not add '&facility_changed' if it is already in url
+            s = '&facility_changed'
+            if s in next_url:
+                next_url = next_url.split(s)[0]
+
             return redirect(to = next_url + '&facility_changed=' + code)
 
 def delete_facility(request):
@@ -292,11 +292,67 @@ def delete_facility(request):
 
     code = '1'
     if name != '':
-        facility_to_delete = Facility.objects.get(name='name')
+        print(Facility.objects.all())
+        facility_to_delete = Facility.objects.get(name=name)
         facility_to_delete.delete()
         code = '0'
 
     return redirect(to = next_url + '?facility_deleted=' + code)
+
+def create_offer(request):
+    code = '1'
+    if request.method == 'POST':
+        next_url = request.POST.get('next_url', '/')
+        new_name = request.POST.get('new_offer_name')
+        new_variant = request.POST.get('new_variant')
+
+        new_offer = Offer(name=new_name, variant=new_variant)        
+        try:
+            new_offer.save()
+            code = '0'
+        except Exception:
+            code = '2'
+
+    return redirect(to = next_url + '?new_offer=' + code)
+
+def edit_offer(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name')
+
+    if name != None:
+        offer = Offer.objects.get(name=name)
+
+    if offer != None:
+        if request.method == 'POST':
+            offer_form = OfferChangeForm(request.POST, instance = request.user)
+
+            if offer_form.is_valid():
+                code = '0'
+
+                offfer.variant = offer_form.cleaned_data.get('variant')
+                offer.items.set(facility_form.cleaned_data.get('items'))
+                offer.save()
+            else:
+                code = '1'
+        
+            # do not add '&offer_changed' if it is already in url
+            s = '&offer_changed'
+            if s in next_url:
+                next_url = next_url.split(s)[0]
+
+            return redirect(to = next_url + '&offer_changed=' + code)
+
+def delete_offer(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name', '')
+
+    code = '1'
+    if name != '':
+        offer_to_delete = Offer.objects.get(name=name)
+        offer_to_delete.delete()
+        code = '0'
+
+    return redirect(to = next_url + '?facility_offer=' + code)
 
 def driver(request):
     context = { 'orders' : Order.objects.filter(handled_by=request.user.id).order_by('-date')[::-1],
@@ -304,7 +360,7 @@ def driver(request):
                 'user' : request.user, 
                 'filter_state' : 'all',
                 'filter_facility' : 'all', 
-                'filter_date' : str(datetime.datetime.date.today()), }
+                'filter_date' : str(datetime.date.today()), }
 
     if request.method == 'POST':
         #get and save status of page

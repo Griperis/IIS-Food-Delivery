@@ -5,7 +5,7 @@
 
 {% if user.is_authenticated %}
     {% if user|has_group:'Driver' %}
-        <form action='' method='GET'> {% csrf_token %}
+        <form action='' method='GET'>
             {# filter by facility #}
             <select name='filter_facility'>
                 <option {% if filter_facility == 'all' %} selected='selected' {% endif %} value='all'> --- </option>
