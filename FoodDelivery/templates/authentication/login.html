@@ -1,38 +1,17 @@
 {% extends 'app/base.html'%}
 
 {% block content %}
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
-  {{ form.errors }}
-  {{ form.non_field_errors }}
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.</p>
-    {% else %}
-      <p>Please login to see this page.</p>
+  <div class="p-5 w-25 mx-auto">
+  <h3>Prosím, přihlašte se.</h3>
+    {% if form.errors %}
+      <p class="font-weight-bold text-danger">Špatné uživatelské jméno nebo heslo.</p>
     {% endif %}
-  {% endif %}
-
-
-  <form method="post" action="">
-  {% csrf_token %}
-  <table>
-
-  <tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-  </tr>
-
-  <tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-  </tr>
-  </table>
-
-  <input type="submit" value="login" />
-  <input type="hidden" name="next" value="{{ next }}" />
-  </form>
-
+    
+    <form method="post" action="">
+      {% csrf_token %}
+      <p>{{ form.username.label }}{{ form.username }}</p>
+      <p>{{ form.password.label }}{{ form.password }}</p>
+      <input type="submit" class="btn btn-warning mb-2" value="Přihlásit se" />
+    </form>
+  </div>
 {% endblock %}

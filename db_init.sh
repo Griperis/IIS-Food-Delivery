@@ -19,17 +19,18 @@ admin_g = Group(name='Administrator')
 admin_g.save()
 user.groups.add(driver_g, operators_g, admin_g)
 
-facility_1 = Facility(name='Na purkynce', address='Ono 98 Tamto 765 15', state='A', opening_time=timezone.now(), closing_time=timezone.now())
+facility_1 = Facility(name='Na purkynce', address='Ono 98 Tamto 765 15', state='A', opening_time=timezone.now(), closing_time=timezone.now(), min_price=0)
 facility_1.save()
 
-beer = Drink(name='Pivo 12', variant='', in_stock=True, price=25, volume=500)
-beer.save()
 
 fries = Food(name='Smazene hranolky', in_stock=True, variant='', price=45, weight=200, ingredients='Brambory, sul')
 fries.save()
 
 drink_offer = Offer(name='Napoje', variant='P')
 drink_offer.save()
+
+beer = Drink(name='Pivo 12', variant='', in_stock=True, price=25, volume=500)
+beer.save()
 drink_offer.items.add(beer)
 
 food_offer = Offer(name='Prilohy', variant='P')

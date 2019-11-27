@@ -1,8 +1,23 @@
 {% extends 'app/base.html' %}
 
+{% load model_extras %}
 {% block content %}
-    <h1>Seznam hospod:</h1>
+<div class="shadow container p-4">
+    <h1>Provozovny</h1>
+    <div class="d-flex flex-wrap facilities-list">
     {% for facility in facilities %}
-        {% include 'app/facility/facility_list_view.html'%}
+        <div class="shadow facility-entry">
+            <h3 class="text-truncate">{{ facility.name }}</h3>
+            <p class="text-truncate"><i class="fas fa-thumbtack color-yellow"></i> Adresa: {{ facility.address }}</p>
+            <p><i class="fas fa-clock color-yellow"></i> Otevírací doba: {{ facility|print_opening_hours }}</p>
+            {% if facility|fac_is_open %}
+                <p><i class="fas fa-circle online-symbol"></i> Otevřeno</p>
+            {% else %}
+                <p><i class="fas fa-circle offline-symbol"></i> Zavřeno</p>
+            {% endif %}
+            <a class="btn btn-warning btn-block" href="{% url 'facility_detail' facility.id %}">Vybrat</a>
+        </div>
     {% endfor %}
+    </div>  
+</div>
 {% endblock %}

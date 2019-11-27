@@ -32,14 +32,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'FoodDelivery.apps.FooddeliveryConfig',
+    'FoodDelivery.apps.FoodDeliveryConfig',
     'django.contrib.admin',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'polymorphic',
+    'django.contrib.contenttypes',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -108,9 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -118,17 +117,31 @@ USE_L10N = True
 
 USE_TZ = True
 
+TIME_INPUT_FORMATS = [
+    '%H:%M:%S',
+]
 
+LANGUAGE_CODE = 'cz'
+
+TIME_ZONE = 'Europe/Prague'
+
+# AWS S3 Part
+AWS_ACCESS_KEY_ID = 'AKIAIEIJS7VJSIAWFUXA'
+AWS_SECRET_ACCESS_KEY = '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'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_STORAGE_BUCKET_NAME = 'iis-fd' 
+AWS_S3_REGION_NAME = 'eu-central-1'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME, AWS_S3_REGION_NAME) 
+
+AWS_LOCATION = 'media'
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 
 django_heroku.settings(locals())
 
