@@ -50,6 +50,9 @@ def user_profile(request):
 def edit_user(request):
     next_url = request.POST.get('next_url')
     selected_user = request.POST.get('selected_user')
+
+    if selected_user == '':
+        return redirect(to=next_url)
     if selected_user != None:
         user = CustomUser.objects.get(username = selected_user)
     else:
@@ -62,25 +65,25 @@ def edit_user(request):
             operator_group = Group.objects.get(name='Operator')
             admin_group = Group.objects.get(name='Administrator')
 
-            if request.POST.get('admin_checkbox') == '1':
-                user.groups.add(admin_group)
-            if request.POST.get('operator_checkbox') == '1':
-                user.groups.add(operator_group)
-            if request.POST.get('driver_checkbox') == '1':
+            user.groups.clear()
+            if request.POST.get("permissions_select") == '1':
+                user.groups.add(driver_group, operator_group, admin_group)
+            if request.POST.get("permissions_select") == '2':
+                user.groups.add(driver_group, operator_group)
+            if request.POST.get("permissions_select") == '3':
                 user.groups.add(driver_group)
-            user.save()
 
             user_form = CustomUserChangeForm(request.POST, instance=request.user)
             if "user" in next_url:
                 next_url = "/user?success=0&tab=info"
             if "custom_admin" in next_url:
-                next_url = next_url + "&success=0"
+                next_url = "/custom_admin/?selected=" + str(user.username) + "&success=0"
 
             if user_form.is_valid():
                 if "user" in next_url:
                     next_url = "/user?success=1&tab=info"
                 if "custom_admin" in next_url:
-                    next_url = next_url[0 : -1] + "1"
+                    next_url = "/custom_admin/?selected=" + str(user.username) + "&success=1"
 
                 user.email = user_form.cleaned_data.get('email')
                 user.first_name = user_form.cleaned_data.get('first_name')
@@ -287,6 +290,11 @@ def admin(request):
     set_password = "-1"
     set_info = "-1"
     new_user = "-1"
+    highest_group = None
+        
+    driver_group = Group.objects.get(name='Driver')
+    operator_group = Group.objects.get(name='Operator')
+    admin_group = Group.objects.get(name='Administrator')
 
     if request.method == 'GET':
         username = request.GET.get("selected",'')
@@ -298,14 +306,26 @@ def admin(request):
         if username != "":
             selected_user = CustomUser.objects.get(username = username)
             user_form = CustomUserChangeForm(initial={ 'username' : selected_user.username, 'email' : selected_user.email, 'first_name' : selected_user.first_name, 'last_name' : selected_user.last_name, 'address' : selected_user.address, 'phone' : selected_user.phone})
+            if selected_user != None:
+                if driver_group in selected_user.groups.all():
+                    highest_group = "Driver"
+                if operator_group in selected_user.groups.all():
+                    highest_group = "Operator"
+                if admin_group in selected_user.groups.all():
+                    highest_group = "Administrator"
+
     else:
         user_form = CustomUserChangeForm(request.POST, instance=request.user)
 
-    return render(request, 'app/admin.html', { 'users': users, 'selected_user' : selected_user, 'user_form' : user_form, 'user_deleted' : user_deleted, 'set_password' : set_password, 'set_info' : set_info, 'new_user' : new_user })
+    return render(request, 'app/admin.html', { 'users': users, 'selected_user' : selected_user, 'user_form' : user_form, 'user_deleted' : user_deleted, 'set_password' : set_password, 'set_info' : set_info, 'new_user' : new_user, 'highest_group' : highest_group })
 
 def admin_set_user_password(request):
     next_url = request.POST.get('next_url')
     username = request.POST.get('username')
+
+    if username == '':
+        return redirect(to=next_url)
+
     if request.method == 'POST':
         new_password = request.POST.get('new_user_password')
         user = CustomUser.objects.get(username = username)
@@ -333,6 +353,7 @@ def admin_create_user(request):
 def delete_user(request):
     next_url = request.POST.get('next_url')
     username = request.POST.get('username')
+
     if username != None and username != "":
         user_to_delete = CustomUser.objects.get(username = username)
         if user_to_delete != request.user:
