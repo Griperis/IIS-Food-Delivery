@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, loader, HttpResponseRedirect, reverse
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
-from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm, CustomAuthenticationForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm, CustomAuthenticationForm, FacilityChangeForm, OfferChangeForm, FoodChangeForm, DrinkChangeForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
+from django.utils import timezone
 
 import datetime
 from .cookies import *
@@ -50,6 +51,9 @@ def user_profile(request):
 def edit_user(request):
     next_url = request.POST.get('next_url')
     selected_user = request.POST.get('selected_user')
+
+    if selected_user == '':
+        return redirect(to=next_url)
     if selected_user != None:
         user = CustomUser.objects.get(username = selected_user)
     else:
@@ -62,25 +66,25 @@ def edit_user(request):
             operator_group = Group.objects.get(name='Operator')
             admin_group = Group.objects.get(name='Administrator')
 
-            if request.POST.get('admin_checkbox') == '1':
-                user.groups.add(admin_group)
-            if request.POST.get('operator_checkbox') == '1':
-                user.groups.add(operator_group)
-            if request.POST.get('driver_checkbox') == '1':
+            user.groups.clear()
+            if request.POST.get("permissions_select") == '1':
+                user.groups.add(driver_group, operator_group, admin_group)
+            if request.POST.get("permissions_select") == '2':
+                user.groups.add(driver_group, operator_group)
+            if request.POST.get("permissions_select") == '3':
                 user.groups.add(driver_group)
-            user.save()
 
             user_form = CustomUserChangeForm(request.POST, instance=request.user)
             if "user" in next_url:
                 next_url = "/user?success=0&tab=info"
             if "custom_admin" in next_url:
-                next_url = next_url + "&success=0"
+                next_url = "/custom_admin/?selected=" + str(user.username) + "&success=0"
 
             if user_form.is_valid():
                 if "user" in next_url:
                     next_url = "/user?success=1&tab=info"
                 if "custom_admin" in next_url:
-                    next_url = next_url[0 : -1] + "1"
+                    next_url = "/custom_admin/?selected=" + str(user.username) + "&success=1"
 
                 user.email = user_form.cleaned_data.get('email')
                 user.first_name = user_form.cleaned_data.get('first_name')
@@ -206,11 +210,374 @@ def order_summary(request, order_id):
     order_data = {'order': order, 'items': order_items }
     return render(request, 'app/order_summary.html', { 'order_data': order_data })
 
-def operator(request, driver_id):
-    return render(request, 'app/operator.html')
+#------------------------------
+
+def operator(request):
+
+    #set default values
+    type_tab = None
+
+    # <<<facility>>>
+    facility_form = FacilityChangeForm()
+    selected_facility = None
+    facility_deleted = '-1'
+    facility_changed = '-1'
+    new_facility = '-1'
+
+    # <<<offer>>>
+    offer_form = OfferChangeForm()
+    selected_offer = None
+    offer_deleted = '-1'
+    offer_changed = '-1'
+    new_offer = '-1'
+
+    # <<<food>>>
+    food_form = FoodChangeForm()
+    selected_food = None
+    food_deleted = '-1'
+    food_changed = '-1'
+    new_food = '-1'
+
+    # <<<drink>>>
+    drink_form = DrinkChangeForm()
+    selected_drink = None
+    drink_deleted = '-1'
+    drink_changed = '-1'
+    new_drink = '-1'
+
+    if request.method == 'GET':
+        # <<<facility>>>
+        name_facility = request.GET.get('selected_facility', '')
+        facility_deleted = request.GET.get('facility_deleted', '')
+        facility_changed = request.GET.get('facility_changed', '')
+        new_facility = request.GET.get('new_facility', '')
+        if name_facility != '':
+            selected_facility = Facility.objects.get(name = name_facility)
+            facility_form = FacilityChangeForm(initial={ 'name' : selected_facility.name, 'address' : selected_facility.address, 'opening_time': selected_facility.opening_time,
+                                                    'closing_time' : selected_facility.closing_time, 'state' : selected_facility.state,
+                                                    'offers' : selected_facility.offers.all() })
+
+        # <<<offer>>>
+        name_offer = request.GET.get('selected_offer', '')
+        offer_deleted = request.GET.get('offer_deleted', '')
+        offer_changed = request.GET.get('offer_changed', '')
+        new_offer = request.GET.get('new_offer', '')
+        if name_offer != '':
+            selected_offer = Offer.objects.get(name = name_offer)
+            offer_form = OfferChangeForm(initial={ 'name' : selected_offer.name, 'variant' : selected_offer.variant,
+                                                    'items' : selected_offer.items.all() })
+        
+        # <<<food>>>
+        name_food = request.GET.get('selected_food', '')
+        food_deleted = request.GET.get('food_deleted', '')
+        food_changed = request.GET.get('food_changed', '')
+        new_food = request.GET.get('new_food', '')
+        if name_food != '':
+            selected_food = Food.objects.get(name = name_food)
+            food_form = FoodChangeForm(initial={ 'name' : selected_food.name, 'variant' : selected_food.variant,
+                                'img' : selected_food.img, 'price' : selected_food.price, 'in_stock' : selected_food.in_stock,
+                                'weight' : selected_food.weight, 'ingredients' : selected_food.ingredients})
+        
+        # <<<drink>>>
+        name_drink = request.GET.get('selected_drink', '')
+        drink_deleted = request.GET.get('drink_deleted', '')
+        drink_changed = request.GET.get('drink_changed', '')
+        new_drink = request.GET.get('new_drink', '')
+        if name_drink != '':
+            selected_drink = Drink.objects.get(name = name_drink)
+            drink_form = DrinkChangeForm(initial={ 'name' : selected_drink.name, 'variant' : selected_drink.variant,
+                                'imt' : selected_drink.img, 'price' : selected_drink.price, 
+                                'in_stock' : selected_drink.in_stock, 'volume' : selected_drink.volume})
+
+        type_tab = request.GET.get('type', '')
+
+    if request.method == 'POST':
+        type_tab = request.POST.get('type') 
+        if type_tab == 'facility':
+            facility_form = FacilityChangeForm(request.POST, instance=request.user)
+        elif type_tab == 'offer':
+            offer_form = OfferChangeForm(request.POST, instance=request.user)
+        elif type_tab == 'food':
+            food_form = FoodChangeForm(request.POST, instance=request.user)
+        elif type_tab == 'drink':
+            drink_form = DrinkChangeForm(request.POST, instance=request.user)
+
+    #send data
+    context = { 'user' : request.user,
+                'type' : type_tab,
+
+                # <<<facility>>>
+                'facilities' : Facility.objects.all(),
+                'selected_facility' : selected_facility,
+                'facility_deleted' : facility_deleted,
+                'facility_changed' : facility_changed,
+                'new_facility' : new_facility, 
+                'fac_form' : facility_form,
+
+                # <<<offer>>>
+                'offers' : Offer.objects.all(),
+                'selected_offer' : selected_offer,
+                'offer_deleted' : offer_deleted,
+                'offer_changed' : offer_changed,
+                'new_offer' : new_offer,
+                'offer_form' : offer_form,
+
+                # <<<food>>>
+                'foods' : Food.objects.all(),
+                'selected_food' : selected_food,
+                'food_deleted' : food_deleted,
+                'food_changed' : food_changed,
+                'new_food' : new_food,
+                'food_form' : food_form,
+
+                # <<<drink>>>
+                'drinks' : Drink.objects.all(),
+                'selected_drink' : selected_drink,
+                'drink_deleted' : drink_deleted,
+                'drink_changed' : drink_changed,
+                'new_drink' : new_drink,
+                'drink_form' : drink_form,
+                }
+    return render(request, 'app/operator.html', context)
+
+def create_facility(request):
+    code = '1'
+    if request.method == 'POST':
+        next_url = request.POST.get('next_url', '/')
+        new_name = request.POST.get('new_facility_name')
+        new_address = request.POST.get('new_facility_address')
+
+        new_facility = Facility(name=new_name, address=new_address, opening_time=timezone.now(), closing_time=timezone.now(), state='D')        
+        try:
+            new_facility.save()
+            code = '0'
+        except Exception:
+            code = '2'
+
+    return redirect(to = next_url + '?new_facility=' + code)
+
+def edit_facility(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name')
+
+    if name != None:
+        facility = Facility.objects.get(name=name)
+
+    if facility != None:
+        if request.method == 'POST':
+            facility_form = FacilityChangeForm(request.POST, instance = request.user)
+
+            if facility_form.is_valid():
+                code = '0'
+
+                facility.address = facility_form.cleaned_data.get('address')
+                facility.opening_time = facility_form.cleaned_data.get('opening_time')
+                facility.closing_time = facility_form.cleaned_data.get('closing_time')
+                facility.state = facility_form.cleaned_data.get('state')
+                facility.offers.set(facility_form.cleaned_data.get('offers'))
+                facility.save()
+            else:
+                code = '1'
+        
+            # do not add '&facility_changed' if it is already in url
+            s = '&facility_changed'
+            if s in next_url:
+                next_url = next_url.split(s)[0]
+
+            return redirect(to = next_url + '&facility_changed=' + code)
+
+def delete_facility(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name', '')
+
+    code = '1'
+    if name != '':
+        print(Facility.objects.all())
+        facility_to_delete = Facility.objects.get(name=name)
+        facility_to_delete.delete()
+        code = '0'
+
+    return redirect(to = next_url + '?facility_deleted=' + code)
+
+def create_offer(request):
+    code = '1'
+    if request.method == 'POST':
+        next_url = request.POST.get('next_url', '/')
+        new_name = request.POST.get('new_offer_name')
+        new_variant = request.POST.get('new_variant')
+
+        new_offer = Offer(name=new_name, variant=new_variant)        
+        try:
+            new_offer.save()
+            code = '0'
+        except Exception:
+            code = '2'
+
+    return redirect(to = next_url + '?new_offer=' + code)
+
+def edit_offer(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name')
+
+    if name != None:
+        offer = Offer.objects.get(name=name)
+
+    if offer != None:
+        if request.method == 'POST':
+            offer_form = OfferChangeForm(request.POST, instance = request.user)
+
+            if offer_form.is_valid():
+                code = '0'
+
+                offer.variant = offer_form.cleaned_data.get('variant')
+                offer.items.set(facility_form.cleaned_data.get('items'))
+                offer.save()
+            else:
+                code = '1'
+        
+            # do not add '&offer_changed' if it is already in url
+            s = '&offer_changed'
+            if s in next_url:
+                next_url = next_url.split(s)[0]
+
+            return redirect(to = next_url + '&offer_changed=' + code)
+
+def delete_offer(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name', '')
+
+    code = '1'
+    if name != '':
+        offer_to_delete = Offer.objects.get(name=name)
+        offer_to_delete.delete()
+        code = '0'
+
+    return redirect(to = next_url + '?offer_deleted=' + code)
+
+def create_food(request):
+    code = '1'
+    if request.method == 'POST':
+        next_url = request.POST.get('next_url', '/')
+        new_name = request.POST.get('new_food_name')
+        new_price = request.POST.get('new_food_price')
+        new_weight = request.POST.get('new_food_weight')
+        new_ingredients = request.POST.get('new_food_ingredients')
+
+        new_food= Food(name=new_name, price=new_price, weight=new_weight, ingredients=new_ingredients, in_stock=False)        
+        try:
+            new_food.save()
+            code = '0'
+        except Exception:
+            code = '2'
+
+    return redirect(to = next_url + '?new_food=' + code)
+
+def edit_food(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name')
+
+    if name != None:
+        food = Food.objects.get(name=name)
+
+    if food != None:
+        if request.method == 'POST':
+            food_form = FoodChangeForm(request.POST, instance = request.user)
+
+            if food_form.is_valid():
+                code = '0'
+
+                food.variant = food_form.cleaned_data.get('variant')
+                food.img = food_form.cleaned_data.get('img')
+                food.price = food_form.cleaned_data.get('prince')
+                food.in_stock = food_form.cleaned_data.get('in_stock')
+                food.weight = food_form.cleaned_data.get('weight')
+                food.ingredients = food_form.cleaned_data.get('ingredients')
+                food.save()
+            else:
+                code = '1'
+        
+            # do not add '&food_changed' if it is already in url
+            s = '&food_changed'
+            if s in next_url:
+                next_url = next_url.split(s)[0]
+
+            return redirect(to = next_url + '&food_changed=' + code)
+
+def delete_food(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name', '')
+
+    code = '1'
+    if name != '':
+        offer_to_delete = Food.objects.get(name=name)
+        offer_to_delete.delete()
+        code = '0'
+
+    return redirect(to = next_url + '?food_deleted=' + code)
+
+def create_drink(request):
+    code = '1'
+    if request.method == 'POST':
+        next_url = request.POST.get('next_url', '/')
+        new_name = request.POST.get('new_drink_name')
+        new_price = request.POST.get('new_drink_price')
+        new_volume = request.POST.get('new_drink_volume')
+
+        new_drink = Drink(name=new_name, price=new_price, volume=new_volume, in_stock=False)        
+        try:
+            new_drink.save()
+            code = '0'
+        except Exception:
+            code = '2'
+
+    return redirect(to = next_url + '?new_drink=' + code)
+
+def edit_drink(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name')
+
+    if name != None:
+        drink = Drink.objects.get(name=name)
+
+    if drink != None:
+        if request.method == 'POST':
+            drink_form = DrinkChangeForm(request.POST, instance = request.user)
+
+            if drink_form.is_valid():
+                code = '0'
+
+                drink.variant = drink_form.cleaned_data.get('variant')
+                drink.img = drink_form.cleaned_data.get('img')
+                drink.price = drink_form.cleaned_data.get('prince')
+                drink.in_stock = drink_form.cleaned_data.get('in_stock')
+                drink.volume = drink_form.cleaned_data.get('volume')
+                drink.save()
+            else:
+                code = '1'
+        
+            # do not add '&drink_changed' if it is already in url
+            s = '&drink_changed'
+            if s in next_url:
+                next_url = next_url.split(s)[0]
+
+            return redirect(to = next_url + '&drink_changed=' + code)
+
+def delete_drink(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name', '')
+
+    code = '1'
+    if name != '':
+        offer_to_delete = Drink.objects.get(name=name)
+        offer_to_delete.delete()
+        code = '0'
+
+    return redirect(to = next_url + '?drink_deleted=' + code)
+
+#------------------------------
 
 def driver(request):
-    context = { 'orders' : Order.objects.all().order_by('-date')[::-1],
+    context = { 'orders' : Order.objects.filter(handled_by=request.user.id).order_by('-date')[::-1],
                 'facilities' : Facility.objects.all(),
                 'user' : request.user, 
                 'filter_state' : 'all',
@@ -287,6 +654,11 @@ def admin(request):
     set_password = "-1"
     set_info = "-1"
     new_user = "-1"
+    highest_group = None
+        
+    driver_group = Group.objects.get(name='Driver')
+    operator_group = Group.objects.get(name='Operator')
+    admin_group = Group.objects.get(name='Administrator')
 
     if request.method == 'GET':
         username = request.GET.get("selected",'')
@@ -298,14 +670,26 @@ def admin(request):
         if username != "":
             selected_user = CustomUser.objects.get(username = username)
             user_form = CustomUserChangeForm(initial={ 'username' : selected_user.username, 'email' : selected_user.email, 'first_name' : selected_user.first_name, 'last_name' : selected_user.last_name, 'address' : selected_user.address, 'phone' : selected_user.phone})
+            if selected_user != None:
+                if driver_group in selected_user.groups.all():
+                    highest_group = "Driver"
+                if operator_group in selected_user.groups.all():
+                    highest_group = "Operator"
+                if admin_group in selected_user.groups.all():
+                    highest_group = "Administrator"
+
     else:
         user_form = CustomUserChangeForm(request.POST, instance=request.user)
 
-    return render(request, 'app/admin.html', { 'users': users, 'selected_user' : selected_user, 'user_form' : user_form, 'user_deleted' : user_deleted, 'set_password' : set_password, 'set_info' : set_info, 'new_user' : new_user })
+    return render(request, 'app/admin.html', { 'users': users, 'selected_user' : selected_user, 'user_form' : user_form, 'user_deleted' : user_deleted, 'set_password' : set_password, 'set_info' : set_info, 'new_user' : new_user, 'highest_group' : highest_group })
 
 def admin_set_user_password(request):
     next_url = request.POST.get('next_url')
     username = request.POST.get('username')
+
+    if username == '':
+        return redirect(to=next_url)
+
     if request.method == 'POST':
         new_password = request.POST.get('new_user_password')
         user = CustomUser.objects.get(username = username)
@@ -333,6 +717,7 @@ def admin_create_user(request):
 def delete_user(request):
     next_url = request.POST.get('next_url')
     username = request.POST.get('username')
+
     if username != None and username != "":
         user_to_delete = CustomUser.objects.get(username = username)
         if user_to_delete != request.user:
