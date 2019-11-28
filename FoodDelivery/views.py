@@ -254,47 +254,59 @@ def operator(request):
 
     if request.method == 'GET':
         # <<<facility>>>
-        name_facility = request.GET.get('selected_facility', '')
+        id_facility = request.GET.get('selected_facility', '')
         facility_deleted = request.GET.get('facility_deleted', '')
         facility_changed = request.GET.get('facility_changed', '')
         new_facility = request.GET.get('new_facility', '')
-        if name_facility != '':
-            selected_facility = Facility.objects.get(name = name_facility)
-            facility_form = FacilityChangeForm(initial={ 'name' : selected_facility.name, 'address' : selected_facility.address, 'opening_time': selected_facility.opening_time,
-                                                    'closing_time' : selected_facility.closing_time, 'state' : selected_facility.state,
-                                                    'offers' : selected_facility.offers.all() })
+        if id_facility != '':
+            try:
+                selected_facility = Facility.objects.get(pk=id_facility)
+                facility_form = FacilityChangeForm(initial={ 'name' : selected_facility.name, 'address' : selected_facility.address, 'opening_time': selected_facility.opening_time,
+                                                        'closing_time' : selected_facility.closing_time, 'state' : selected_facility.state,
+                                                        'offers' : selected_facility.offers.all() })
+            except Exception:
+                ...
 
         # <<<offer>>>
-        name_offer = request.GET.get('selected_offer', '')
+        id_offer = request.GET.get('selected_offer', '')
         offer_deleted = request.GET.get('offer_deleted', '')
         offer_changed = request.GET.get('offer_changed', '')
         new_offer = request.GET.get('new_offer', '')
-        if name_offer != '':
-            selected_offer = Offer.objects.get(name = name_offer)
-            offer_form = OfferChangeForm(initial={ 'name' : selected_offer.name, 'variant' : selected_offer.variant,
-                                                    'items' : selected_offer.items.all() })
-        
+        if id_offer != '':
+            try:
+                selected_offer = Offer.objects.get(pk=id_offer)
+                offer_form = OfferChangeForm(initial={ 'name' : selected_offer.name, 'variant' : selected_offer.variant,
+                                                        'items' : selected_offer.items.all() })
+            except Exception:
+                ...
+
         # <<<food>>>
-        name_food = request.GET.get('selected_food', '')
+        id_food = request.GET.get('selected_food', '')
         food_deleted = request.GET.get('food_deleted', '')
         food_changed = request.GET.get('food_changed', '')
         new_food = request.GET.get('new_food', '')
-        if name_food != '':
-            selected_food = Food.objects.get(name = name_food)
-            food_form = FoodChangeForm(initial={ 'name' : selected_food.name, 'variant' : selected_food.variant,
-                                'img' : selected_food.img, 'price' : selected_food.price, 'in_stock' : selected_food.in_stock,
-                                'weight' : selected_food.weight, 'ingredients' : selected_food.ingredients})
-        
+        if id_food != '':
+            try:
+                selected_food = Food.objects.get(pk=id_food)
+                food_form = FoodChangeForm(initial={ 'name' : selected_food.name, 'variant' : selected_food.variant,
+                                    'img' : selected_food.img, 'price' : selected_food.price, 'in_stock' : selected_food.in_stock,
+                                    'weight' : selected_food.weight, 'ingredients' : selected_food.ingredients})
+            except Exception:
+                ...
+
         # <<<drink>>>
-        name_drink = request.GET.get('selected_drink', '')
+        id_drink = request.GET.get('selected_drink', '')
         drink_deleted = request.GET.get('drink_deleted', '')
         drink_changed = request.GET.get('drink_changed', '')
         new_drink = request.GET.get('new_drink', '')
-        if name_drink != '':
-            selected_drink = Drink.objects.get(name = name_drink)
-            drink_form = DrinkChangeForm(initial={ 'name' : selected_drink.name, 'variant' : selected_drink.variant,
-                                'imt' : selected_drink.img, 'price' : selected_drink.price, 
-                                'in_stock' : selected_drink.in_stock, 'volume' : selected_drink.volume})
+        if id_drink != '':
+            try:
+                selected_drink = Drink.objects.get(pk=id_drink)
+                drink_form = DrinkChangeForm(initial={ 'name' : selected_drink.name, 'variant' : selected_drink.variant,
+                                    'imt' : selected_drink.img, 'price' : selected_drink.price, 
+                                    'in_stock' : selected_drink.in_stock, 'volume' : selected_drink.volume})
+            except Exception:
+                ...
 
         type_tab = request.GET.get('type', '')
 
@@ -367,8 +379,13 @@ def edit_facility(request):
     next_url = request.POST.get('next_url')
     name = request.POST.get('name')
 
+    facility = None
+    code = '2'
     if name != None:
-        facility = Facility.objects.get(name=name)
+        try:
+            facility = Facility.objects.get(pk=name)
+        except Exception:
+            ...
 
     if facility != None:
         if request.method == 'POST':
@@ -393,22 +410,28 @@ def edit_facility(request):
 
             return redirect(to = next_url + '&facility_changed=' + code)
 
+    return redirect(to = next_url + '?facility_changed=' + code)
+
 def delete_facility(request):
     next_url = request.POST.get('next_url')
     name = request.POST.get('name', '')
 
     code = '1'
     if name != '':
-        print(Facility.objects.all())
-        facility_to_delete = Facility.objects.get(name=name)
-        facility_to_delete.delete()
-        code = '0'
+        try:
+            print(Facility.objects.all())
+            facility_to_delete = Facility.objects.get(pk=name)
+            facility_to_delete.delete()
+            code = '0'
+        except Exception:
+            ...
 
     return redirect(to = next_url + '?facility_deleted=' + code)
 
 def create_offer(request):
     code = '1'
     if request.method == 'POST':
+        type_tab = request.POST.get('type', '')
         next_url = request.POST.get('next_url', '/')
         new_name = request.POST.get('new_offer_name')
         new_variant = request.POST.get('new_variant')
@@ -420,14 +443,19 @@ def create_offer(request):
         except Exception:
             code = '2'
 
-    return redirect(to = next_url + '?new_offer=' + code)
+    return redirect(to = next_url + '?new_offer=' + code + '&type=' + type_tab)
 
 def edit_offer(request):
     next_url = request.POST.get('next_url')
     name = request.POST.get('name')
 
+    offer = None
+    code = '2'
     if name != None:
-        offer = Offer.objects.get(name=name)
+        try:
+            offer = Offer.objects.get(pk=name)
+        except Exception:
+            ...
 
     if offer != None:
         if request.method == 'POST':
@@ -437,7 +465,7 @@ def edit_offer(request):
                 code = '0'
 
                 offer.variant = offer_form.cleaned_data.get('variant')
-                offer.items.set(facility_form.cleaned_data.get('items'))
+                offer.items.set(offer_form.cleaned_data.get('items'))
                 offer.save()
             else:
                 code = '1'
@@ -449,21 +477,30 @@ def edit_offer(request):
 
             return redirect(to = next_url + '&offer_changed=' + code)
 
+    if '?' in next_url:
+        next_url = next_url.split('?')[0]
+    return redirect(to = next_url + '?offer_changed=' + code + '&type=offer')
+
 def delete_offer(request):
+    type = request.POST.get('type', '')
     next_url = request.POST.get('next_url')
     name = request.POST.get('name', '')
 
     code = '1'
     if name != '':
-        offer_to_delete = Offer.objects.get(name=name)
-        offer_to_delete.delete()
-        code = '0'
+        try:
+            offer_to_delete = Offer.objects.get(pk=name)
+            offer_to_delete.delete()
+            code = '0'
+        except Exception:
+            ...
 
-    return redirect(to = next_url + '?offer_deleted=' + code)
+    return redirect(to = next_url + '?offer_deleted=' + code + '&type=' + type_tab)
 
 def create_food(request):
     code = '1'
     if request.method == 'POST':
+        type_tab = request.POST.get('type', '')
         next_url = request.POST.get('next_url', '/')
         new_name = request.POST.get('new_food_name')
         new_price = request.POST.get('new_food_price')
@@ -477,14 +514,19 @@ def create_food(request):
         except Exception:
             code = '2'
 
-    return redirect(to = next_url + '?new_food=' + code)
+    return redirect(to = next_url + '?new_food=' + code + '&type=' + type_tab)
 
 def edit_food(request):
     next_url = request.POST.get('next_url')
     name = request.POST.get('name')
 
+    food = None
+    code = '2'
     if name != None:
-        food = Food.objects.get(name=name)
+        try:
+            food = Food.objects.get(pk=name)
+        except Exception:
+            ...
 
     if food != None:
         if request.method == 'POST':
@@ -495,7 +537,7 @@ def edit_food(request):
 
                 food.variant = food_form.cleaned_data.get('variant')
                 food.img = food_form.cleaned_data.get('img')
-                food.price = food_form.cleaned_data.get('prince')
+                food.price = food_form.cleaned_data.get('price')
                 food.in_stock = food_form.cleaned_data.get('in_stock')
                 food.weight = food_form.cleaned_data.get('weight')
                 food.ingredients = food_form.cleaned_data.get('ingredients')
@@ -510,21 +552,30 @@ def edit_food(request):
 
             return redirect(to = next_url + '&food_changed=' + code)
 
+    if '?' in next_url:
+        next_url = next_url.split('?')[0]
+    return redirect(to = next_url + '?food_changed=' + code + '&type=food')
+
 def delete_food(request):
+    type_tab = request.POST.get('type', '')
     next_url = request.POST.get('next_url')
     name = request.POST.get('name', '')
 
     code = '1'
     if name != '':
-        offer_to_delete = Food.objects.get(name=name)
-        offer_to_delete.delete()
-        code = '0'
+        try:
+            offer_to_delete = Food.objects.get(pk=name)
+            offer_to_delete.delete()
+            code = '0'
+        except Exception:
+            ...
 
-    return redirect(to = next_url + '?food_deleted=' + code)
+    return redirect(to = next_url + '?food_deleted=' + code + '&type=' + type_tab)
 
 def create_drink(request):
     code = '1'
     if request.method == 'POST':
+        type_tab = request.POST.get('type', '')
         next_url = request.POST.get('next_url', '/')
         new_name = request.POST.get('new_drink_name')
         new_price = request.POST.get('new_drink_price')
@@ -537,14 +588,19 @@ def create_drink(request):
         except Exception:
             code = '2'
 
-    return redirect(to = next_url + '?new_drink=' + code)
+    return redirect(to = next_url + '?new_drink=' + code + '&type=' + type_tab)
 
 def edit_drink(request):
     next_url = request.POST.get('next_url')
     name = request.POST.get('name')
 
+    drink = None
+    code = '2'
     if name != None:
-        drink = Drink.objects.get(name=name)
+        try:
+            drink = Drink.objects.get(pk=name)
+        except Exception:
+            ...
 
     if drink != None:
         if request.method == 'POST':
@@ -555,7 +611,7 @@ def edit_drink(request):
 
                 drink.variant = drink_form.cleaned_data.get('variant')
                 drink.img = drink_form.cleaned_data.get('img')
-                drink.price = drink_form.cleaned_data.get('prince')
+                drink.price = drink_form.cleaned_data.get('price')
                 drink.in_stock = drink_form.cleaned_data.get('in_stock')
                 drink.volume = drink_form.cleaned_data.get('volume')
                 drink.save()
@@ -569,17 +625,25 @@ def edit_drink(request):
 
             return redirect(to = next_url + '&drink_changed=' + code)
 
+    if '?' in next_url:
+        next_url = next_url.split('?')[0]
+    return redirect(to = next_url + '?drink_changed=' + code + '&type=drink')
+
 def delete_drink(request):
+    type_tab = request.POST.get('type', '')
     next_url = request.POST.get('next_url')
     name = request.POST.get('name', '')
 
     code = '1'
     if name != '':
-        offer_to_delete = Drink.objects.get(name=name)
-        offer_to_delete.delete()
-        code = '0'
+        try:
+            offer_to_delete = Drink.objects.get(pk=name)
+            offer_to_delete.delete()
+            code = '0'
+        except Exception:
+            ...
 
-    return redirect(to = next_url + '?drink_deleted=' + code)
+    return redirect(to = next_url + '?drink_deleted=' + code + '&type=' + type_tab)
 
 #------------------------------
 

@@ -82,7 +82,7 @@ class FacilityChangeForm(forms.ModelForm):
         fields = ('name', 'address', 'opening_time', 'closing_time', 'state', 'offers')
         labels = {'name' : _('Jméno'), 'address' : _('Adresa'), 'opening_time' : _('Otevírací doba'), 
                     'closing_time' : _('Zavírací doba')}
-        widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control', 'readonly' : 'readonly'}),
+        widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control'}),
                     'address' : forms.TextInput(attrs={'class' : 'form-control'}), 
                     'opening_time' : forms.TimeInput(attrs={'class': 'form-control'}),
                     'closing_time' :  forms.TimeInput(attrs={'class': 'form-control'}),   
@@ -106,7 +106,7 @@ class OfferChangeForm(forms.ModelForm):
         model = Offer
         fields = ('name', 'variant', 'items')
         labels = {'name' : _('Název'), }
-        widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control', 'readonly' : 'readonly'}), }
+        widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control'}), }
 
 class FoodChangeForm(forms.ModelForm):
 
@@ -115,7 +115,7 @@ class FoodChangeForm(forms.ModelForm):
         fields = {'name', 'variant', 'img', 'price', 'in_stock', 'weight', 'ingredients'}
         labels = {'name' : _('Název'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
                     'in_stock' : _('Dostupnost'), 'weight' : _('Gramáž'), 'ingredients' : _('Složení')}
-        widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control', 'readonly' : 'readonly'}),
+        widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control'}),
                     'variant' : forms.TextInput(attrs={'class' : 'form-control'}),}
 
     field_order = ['name', 'variant', 'img', 'in_stock', 'price' , 'weight', 'ingredients']
@@ -127,7 +127,7 @@ class DrinkChangeForm(forms.ModelForm):
         fields = {'name', 'variant', 'img', 'price', 'in_stock', 'volume'}
         labels = {'name' : _('Název'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
                     'in_stock' : _('Dostupnost'), 'volume' : _('Objem (ml)'), }
-        widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control', 'readonly' : 'readonly'}),
+        widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control'}),
                     'variant' : forms.TextInput(attrs={'class' : 'form-control'}),}
 
     field_order = ['name', 'variant', 'img', 'in_stock', 'price' , 'volume']
