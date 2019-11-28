@@ -8,7 +8,7 @@
         <select id="select" class="form-control" onchange="if(this.value != '0') window.location.href = '?selected_drink=' +  this.value + '&amp;type=drink';">
             <option value="0" selected disabled hidden>Vyberte nápoj</option>
             {% for drink in drinks %}
-                <option value="{{ drink.name }}" {% if drink.name == selected_drink.name %} selected {% endif %}>{{ drink.name }}</option>
+                <option value="{{ drink.pk }}" {% if drink.pk == selected_drink.pk %} selected {% endif %}>{{ drink.name }}</option>
             {% endfor %}
         </select></p>
     </form>
@@ -21,7 +21,7 @@
     {% endif %}
 
     <form action="{% url 'delete_drink' %}" method="POST"> {% csrf_token %}
-        <input type="hidden" name="name" value="{{ selected_drink.name }}"/>
+        <input type="hidden" name="name" value="{{ selected_drink.pk }}"/>
         <input type="hidden" name="next_url" value="{{ request.path }}"/>
         <input type="hidden" name="type" value="drink"/>
         <input type="submit" class="btn btn-danger mb-2" value="Smazat nápoj"/>
@@ -36,9 +36,11 @@
                 <p class="font-weight-bold text-success">Hodnoty úspěšně změněny!</p>
             {% elif drink_changed == '1' %}
                 <p class="font-weight-bold text-danger">Hodnoty nebyly změněny, špatný formát v některém poli!</p>
+            {% elif drink_changed == '2' %}
+                <p class="font-weight-bold text-danger">Vyberte nápoj!</p>
             {% endif %}
 
-            <input type="hidden" name="name" value="{{ selected_drink.name }}"/>
+            <input type="hidden" name="name" value="{{ selected_drink.pk }}"/>
             <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
             <input type="hidden" name="type" value="drink"/>
             <input type="submit" class="btn btn-warning mb-2" value="Potvrdit změny"/>
@@ -63,7 +65,7 @@
                     <input type="text" name="new_drink_volume" class="form-control" required="" >
                 </p>
                 <input type="hidden" name="next_url" value="{{ request.path }}"/>
-                <input type="hidden" name="type" value="food"/>
+                <input type="hidden" name="type" value="drink"/>
 
                 {# write out the details of operation #}
                 {% if new_drink == "0" %}
