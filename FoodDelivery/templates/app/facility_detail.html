@@ -56,21 +56,15 @@
         <div class="shadow p-2 mt-3 bg-white sticky-top rounded fd-search">
             <form class="form-inline mb-0 reload-scroll-back" method="GET">
                 <h2 class="mr-auto mb-0">Aktuální nabídka</h2>
-                {% if search_form.search != '' %}
-                    <button class="btn close mr-2" type="submit" name="submit" value="remove_filter">&times;</button>
-                {% endif %}
                 <input class="form-control mr-2" type="text" name="search" value="{{ search_form.search }}" placeholder="Vyhledat v pokrmech">
                 <select name="filter_type" class="form-control mr-2">
                     <option value="name" {% if search_form.type == 'name' %} selected {% endif %}>Jméno</option>
                     <option value="type" {% if search_form.type == 'type' %} selected {% endif %}>Typ</option>
                 </select>
-                <!-- <label class="mr-2">
-                    <input type="checkbox" value="1" name="daily" {% if search_form.daily %} checked {% endif %}> Denní nabídky
-                </label>
-                <label class="mr-2">
-                    <input type="checkbox" value="1" name="permanent" {% if search_form.permanent %} checked {% endif %}> Stálé nabídky
-                </label> -->
                 <button class="btn btn-warning" type="submit" name="submit" value="search">Hledat <i class="fas fa-search"></i></button>
+                {% if search_form.search != '' %}
+                    <button class="btn close ml-2 mr-2" type="submit" name="submit" value="remove_filter">&times;</button>
+                {% endif %}
             </form>
         </div>
         {% for offer in offers.values %}
@@ -101,6 +95,8 @@
                 {% endfor %}
             </div>
         </div>
+        {% empty %}
+        Žádné provozovny k zobrazení
         {% endfor %}
     </div>
 </div>
