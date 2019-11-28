@@ -32,6 +32,9 @@ urlpatterns = [
     path('create_drink/', views.create_drink, name='create_drink'),
     path('edit_drink/', views.edit_drink, name='edit_drink'),
     path('delete_drink/', views.delete_drink, name='delete_drink'),
+
+    path('accept_order/', views.accept_order, name='accept_order'),
+    path('filter_order/', views.filter_order, name='filter_order'),
 ]
 
 # Authentication urls!

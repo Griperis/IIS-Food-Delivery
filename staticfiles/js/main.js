@@ -28,4 +28,8 @@ function goto_tab(type)
     {
         $('[href="#nav-drinks"]').tab('show')    
     }
+    else if (type == 'order')
+    {
+        $('[href="#nav-orders"]').tab('show')
+    }
 }

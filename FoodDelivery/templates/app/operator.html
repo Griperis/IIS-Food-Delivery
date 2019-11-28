@@ -14,6 +14,7 @@
                         <a class="nav-item nav-link" id="nav-offers-tab" data-toggle="tab" href="#nav-offers" role="tab" aria-controls="nav-offers" aria-selected="false">Nabídky</a>
                         <a class="nav-item nav-link" id="nav-foods-tab" data-toggle="tab" href="#nav-foods" role="tab" aria-controls="nav-foods" aria-selected="false">Jídla</a>
                         <a class="nav-item nav-link" id="nav-drinks-tab" data-toggle="tab" href="#nav-drinks" role="tab" aria-controls="nav-drinks" aria-selected="false">Nápoje</a>
+                        <a class="nav-item nav-link" id="nav-orders-tab" data-toggle="tab" href="#nav-orders" role="tab" aria-controls="nav-orders" aria-selected="false">Objednávky</a>
                     </div>
                 </nav>
 
@@ -37,6 +38,24 @@
                     <div class="tab-pane fade" id="nav-drinks" role="tabpanel" aria-labelledby="nav-orders-tab">
                         {% include 'app/operator_drinks.html'%}
                     </div>
+
+                    {# --- orders --- #}
+                    <div class="tab-pane fade" id="nav-orders" role="tabpanel" aria-labelledby="nav-orders-tab">
+
+                        Filtr:
+                        <form acition="{% url 'filter_order' %}" method="GET">
+                            <select name="select_state" id="select_state" class="form-control">
+                                <option value="all"> --- </otpion>
+                                <option value="C"> vytvořené objednávky </option>
+                            </select></p>
+
+                            <input type="submit" class="btn btn-warning mb-2" value="Potvrdit"/>
+                        </form>
+
+                        {% for order_data in orders_with_data %}
+                            {% include 'app/operator_orders.html'%}
+                        {% endfor %}
+                    </div>
                 </div>
 
             {% else %}
@@ -57,6 +76,8 @@
     <body onload="goto_tab('food')"> 
 {% elif type == 'drink' %}
     <body onload="goto_tab('drink')"> 
+{% elif type == 'order' %}
+    <body onload="goto_tab('order')"> 
 {% endif %}
 
 {% endblock  %}

@@ -252,6 +252,20 @@ def operator(request):
     drink_changed = '-1'
     new_drink = '-1'
 
+    # <<<orders>>>
+    state = request.GET.get('select_state', '')
+    drivers = CustomUser.objects.filter(groups__name__in=['Driver'])
+    if state == 'C':
+        orders = Order.objects.filter(state='C')
+    else:
+        orders = Order.objects.all()
+    orders_with_data = []
+    for order in orders:
+        items = OrderItem.objects.all().filter(order = order)
+        order_data = {"order" : order, "items" : items}
+        orders_with_data.append(order_data)    
+    orders_with_data.reverse()
+
     if request.method == 'GET':
         # <<<facility>>>
         id_facility = request.GET.get('selected_facility', '')
@@ -356,6 +370,10 @@ def operator(request):
                 'drink_changed' : drink_changed,
                 'new_drink' : new_drink,
                 'drink_form' : drink_form,
+
+                # <<<order>>>
+                'drivers' : drivers,
+                'orders_with_data' : orders_with_data,
                 }
     return render(request, 'app/operator.html', context)
 
@@ -644,6 +662,33 @@ def delete_drink(request):
             ...
 
     return redirect(to = next_url + '?drink_deleted=' + code + '&type=' + type_tab)
+
+def accept_order(request):
+    type_tab = request.POST.get('type', '')
+    next_url = request.POST.get('next_url')
+
+    if request.method == 'POST':
+        id_driver = request.POST.get('select_driver')
+        id_order = request.POST.get('id_order')
+        state = request.POST.get('select_state')
+
+        try:
+            driver = CustomUser.objects.get(pk=id_driver)
+            order = Order.objects.get(pk=id_order)
+            order.state = state
+            order.handled_by = driver
+            order.save()
+        except Exception:
+            ...
+
+    return redirect(to = next_url + '?type=' + type_tab)
+
+def filter_order(request):
+    type_tab = request.GET.get('type', '')
+    next_url = request.GET.get('next_url')
+    state = request.GET.get('select_state')
+
+    return redirect(to = next_url + '?select_state=' + state + '&type=' + type_tab)
 
 #------------------------------
 

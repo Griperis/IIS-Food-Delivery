@@ -34,6 +34,8 @@ class CustomUser(AbstractUser):
 
 class Order(models.Model):
     ORDER_STATE = (
+        ('C', 'CREATED'),
+        ('X', 'CANCELED'),
         ('A', 'ACCEPTED'),
         ('D', 'DELIVERING'),
         ('F', 'FINISHED'),
