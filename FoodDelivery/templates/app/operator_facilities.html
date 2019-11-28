@@ -4,10 +4,10 @@
     {# find facility #}
     <form action="#" method="get">
          <p><label for="select">Výběr provozovny:</label>
-        <select id="select" class="form-control" onchange="if(this.value != '0') window.location.href = '?selected_facility=' +  this.value + '&amp;type=facility';">
-            <option value="0" selected disabled hidden>Vyberte provozovnu</option>
+        <select id="select" class="form-control" onchange="if(this.value != '-1') window.location.href = '?selected_facility=' +  this.value + '&amp;type=facility';">
+            <option value="-1" selected disabled hidden>Vyberte provozovnu</option>
             {% for fac in facilities %}
-                <option value="{{ fac.name }}" {% if fac.name == selected_facility.name %} selected {% endif %}>{{ fac.name }}</option>
+                <option value="{{ fac.pk }}" {% if fac.pk == selected_facility.pk %} selected {% endif %}>{{ fac.name }}</option>
             {% endfor %}
         </select></p>
     </form>
@@ -20,7 +20,7 @@
     {% endif %}
 
     <form action="{% url 'delete_facility' %}" method="POST"> {% csrf_token %}
-        <input type="hidden" name="name" value="{{ selected_facility.name }}"/>
+        <input type="hidden" name="name" value="{{ selected_facility.pk }}"/>
         <input type="hidden" name="next_url" value="{{ request.path }}"/>
         <input type="hidden" name="type" value="facility"/>
         <input type="submit" class="btn btn-danger mb-2" value="Smazat provozvnu"/>
@@ -35,9 +35,11 @@
                 <p class="font-weight-bold text-success">Hodnoty úspěšně změněny!</p>
             {% elif facility_changed == '1' %}
                 <p class="font-weight-bold text-danger">Hodnoty nebyly změněny, špatný formát v některém poli!</p>
+            {% elif facility_changed == '2' %}
+                <p class="font-weight-bold text-danger">Vyberte provozvnu!</p>
             {% endif %}
 
-            <input type="hidden" name="name" value="{{ selected_facility.name }}"/>
+            <input type="hidden" name="name" value="{{ selected_facility.pk }}"/>
             <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
             <input type="hidden" name="type" value="facility"/>
             <input type="submit" class="btn btn-warning mb-2" value="Potvrdit změny"/>
