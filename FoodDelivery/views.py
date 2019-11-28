@@ -107,22 +107,49 @@ def change_password(request):
                 return redirect(to='/login')
             return redirect(to='/user?pwdsuccess=0&tab=info')
 
-def filter_offers(facility, filter_form):
+def filter_offers(facility, request):
+    is_filter = False
+    if request.get('submit'):
+        if request['submit'] == 'remove_filter':
+            is_filter = False
+        elif request['submit'] == 'search':
+            is_filter = True
+
+    filter_form = {
+        'search': request.get('search', ''),
+        'type': request.get('filter_type', ''),
+        'daily': request.get('daily', None),
+        'perm': request.get('perm', None)
+    }
+
     search_field = filter_form['search']
     type_field = filter_form['type']
-    offers = facility.offers.all()
+
+    offers = None
+    if is_filter:
+        if filter_form['daily'] is not None and filter_form['perm'] is not None:
+            offers = Offer.objects.all()
+        elif filter_form['daily'] is not None:
+            offers = Offer.objects.filter(variant='D')
+        elif filter_form['perm'] is not None:
+            offers = Offer.objects.filter(variant='P')
+    else:
+        offers = Offer.objects.all()
+        filter_form['daily'] = '1'
+        filter_form['perm'] = '1'
+
     filtered_offers = {}
-    for offer in offers:
-        if search_field != '':
-            if type_field == 'type':
-                filtered_items = offer.items.filter(variant__contains=search_field)
+    if offers is not None:
+        for offer in offers.order_by('variant'):
+            if search_field != '':
+                if type_field == 'type':
+                    filtered_items = offer.items.filter(variant__contains=search_field)
+                else:
+                    filtered_items = offer.items.filter(name__contains=search_field)
             else:
-                filtered_items = offer.items.filter(name__contains=search_field)
-        else:
-            filtered_items = offer.items.all()
-        
-        filtered_offers[offer.pk] = {'items': filtered_items, 'name': offer.name, 'variant': offer.variant}
-    return filtered_offers
+                filtered_items = offer.items.all()
+            filtered_offers[offer.pk] = {'items': filtered_items, 'name': offer.name, 'variant': offer.variant}
+    return (filtered_offers, filter_form)
 
 def create_new_order(order_state, facility_id, user):
     facility = get_object_or_404(Facility, pk=facility_id)
@@ -158,23 +185,7 @@ def facility_detail(request, facility_id):
     else:
         facility = get_object_or_404(Facility, pk=facility_id)
 
-        search_field = ''
-        type_field = ''
-
-        if request.GET.get('search'):
-            search_field = request.GET['search']
-        if request.GET.get('filter_type'):
-            type_field = request.GET['filter_type']
-        
-        if search_field == '':
-            filter_form = load_form_state(request)
-        else:
-            filter_form = {'search': search_field, 'type': type_field}
-
-        if request.GET.get('submit'):
-            if request.GET['submit'] == 'remove_filter':
-                filter_form = {'type': '', 'search': ''}
-        filtered_offers = filter_offers(facility, filter_form)
+        filtered_offers, filter_form = filter_offers(facility, request.GET)
 
         is_open = is_fac_open(facility)
         context = {
