@@ -1,11 +1,11 @@
 {% extends 'app/base.html' %}
 {% load auth_extras %}
+
 {% block content %}
-<h5>DRIVER</h5>
 
 {% if user.is_authenticated %}
     {% if user|has_group:'Driver' %}
-        <form action='' method='GET'> {% csrf_token %}
+        <form action='' method='GET'>
             {# filter by facility #}
             <select name='filter_facility'>
                 <option {% if filter_facility == 'all' %} selected='selected' {% endif %} value='all'> --- </option>
@@ -68,4 +68,5 @@
     Musíte se nejdřív přihlásit!<br>
     <a href="{% url 'login' %}" > přihlasit se </a><br>
 {% endif %}
+
 {% endblock %}

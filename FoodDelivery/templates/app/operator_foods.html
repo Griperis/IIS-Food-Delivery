@@ -1,0 +1,86 @@
+{% block foods %}
+
+<h3> Jídla </h3>
+
+    {# find food #}
+    <form action="#" method="get">
+        <p><label for="select">Výběr jídla:</label>
+        <select id="select" class="form-control" onchange="if(this.value != '0') window.location.href = '?selected_food=' +  this.value + '&amp;type=food';">
+            <option value="0">Nabídka</option>
+            {% for food in foods %}
+                <option value="{{ food.name }}" {% if food.name == selected_food.name %} selected {% endif %}>{{ food.name }}</option>
+            {% endfor %}
+        </select></p>
+    </form>
+
+    {# delete food #}
+    {% if food_deleted == '0' %}
+        <p class="font-weight-bold text-success">Jídlo vymazáno!</p>
+    {% elif food_deleted == '1' %}
+        <p class="font-weight-bold text-danger">Chyba při mazání jídla!</p>
+    {% endif %}
+
+    <form action="{% url 'delete_food' %}" method="POST"> {% csrf_token %}
+        <input type="hidden" name="name" value="{{ selected_food.name }}"/>
+        <input type="hidden" name="next_url" value="{{ request.path }}"/>
+        <input type="hidden" name="type" value="food"/>
+        <input type="submit" class="btn btn-danger mb-2" value="Smazat jídlo"/>
+    </form>
+
+    {# edit food #}
+    <div class="pt-2">
+        <form action="{% url 'edit_food' %}" method="POST"> {% csrf_token %}
+            {{ food_form.as_p }}
+
+            {% if food_changed == '0' %}
+                <p class="font-weight-bold text-success">Hodnoty úspěšně změněny!</p>
+            {% elif food_changed == '1' %}
+                <p class="font-weight-bold text-danger">Hodnoty nebyly změněny, špatný formát v některém poli!</p>
+            {% endif %}
+
+            <input type="hidden" name="name" value="{{ selected_food.name }}"/>
+            <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
+            <input type="hidden" name="type" value="food"/>
+            <input type="submit" class="btn btn-warning mb-2" value="Potvrdit změny"/>
+        </form>
+    </div>
+
+    {# create new food #}
+    <div class="col-sm">
+        <div>
+            <h3>Vytvoření nového jídla</h3>
+            <form action="{% url 'create_food' %}" method="POST"> {% csrf_token %}
+                <p>
+                    <label for="new_food_name">Název jídla:</label>
+                    <input type="text" name="new_food_name" class="form-control" required="" >
+                </p>
+                <p>
+                    <label for="new_food_price">Cena:</label>
+                    <input type="text" name="new_food_price" class="form-control" required="" >
+                </p>
+                <p>
+                    <label for="new_food_weight">Gramáž:</label>
+                    <input type="text" name="new_food_weight" class="form-control" required="" >
+                </p>
+                <p>
+                    <label for="new_food_ingredients">Složení:</label>
+                    <input type="text" name="new_food_ingredients" class="form-control" required="" >
+                </p>
+                <input type="hidden" name="next_url" value="{{ request.path }}"/>
+                <input type="hidden" name="type" value="food"/>
+
+                {# write out the details of operation #}
+                {% if new_food == "0" %}
+                    <p class="font-weight-bold text-success">Jídlo vytvořeno!</p>
+                {% elif new_food == "1" %}
+                    <p class="font-weight-bold text-danger">Chyba při vytváření jídla!</p>
+                {% elif new_food == "2" %}
+                    <p class="font-weight-bold text-danger">Jídlo již existuje!</p>
+                {% endif %}
+
+                <input type="submit" class="btn btn-warning mb-2" value="Přidat jídlo">
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
