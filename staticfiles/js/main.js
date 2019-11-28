@@ -14,3 +14,18 @@ function goto_profile(){
     $('[href="#nav-profile"]').tab('show');
 }
 
+function goto_tab(type)
+{
+    if (type == 'offer') 
+    {
+        $('[href="#nav-offers"]').tab('show')    
+    }
+    else if (type == 'food')
+    {
+        $('[href="#nav-foods"]').tab('show')    
+    }
+    else if (type == 'drink')
+    {
+        $('[href="#nav-drinks"]').tab('show')    
+    }
+}

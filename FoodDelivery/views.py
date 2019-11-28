@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse, loader, HttpResponseRedirect, reverse
 from .models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
-from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm, CustomAuthenticationForm, FacilityChangeForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomPasswordChangeForm, CustomAuthenticationForm, FacilityChangeForm, OfferChangeForm, FoodChangeForm, DrinkChangeForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
 from django.utils import timezone
@@ -207,37 +207,134 @@ def order_summary(request, order_id):
     order_data = {'order': order, 'items': order_items }
     return render(request, 'app/order_summary.html', { 'order_data': order_data })
 
+#------------------------------
+
 def operator(request):
+
     #set default values
+    type_tab = None
+
+    # <<<facility>>>
     facility_form = FacilityChangeForm()
     selected_facility = None
     facility_deleted = '-1'
     facility_changed = '-1'
     new_facility = '-1'
 
+    # <<<offer>>>
+    offer_form = OfferChangeForm()
+    selected_offer = None
+    offer_deleted = '-1'
+    offer_changed = '-1'
+    new_offer = '-1'
+
+    # <<<food>>>
+    food_form = FoodChangeForm()
+    selected_food = None
+    food_deleted = '-1'
+    food_changed = '-1'
+    new_food = '-1'
+
+    # <<<drink>>>
+    drink_form = DrinkChangeForm()
+    selected_drink = None
+    drink_deleted = '-1'
+    drink_changed = '-1'
+    new_drink = '-1'
+
     if request.method == 'GET':
+        # <<<facility>>>
         name_facility = request.GET.get('selected_facility', '')
         facility_deleted = request.GET.get('facility_deleted', '')
         facility_changed = request.GET.get('facility_changed', '')
         new_facility = request.GET.get('new_facility', '')
-
         if name_facility != '':
             selected_facility = Facility.objects.get(name = name_facility)
             facility_form = FacilityChangeForm(initial={ 'name' : selected_facility.name, 'address' : selected_facility.address, 'opening_time': selected_facility.opening_time,
                                                     'closing_time' : selected_facility.closing_time, 'state' : selected_facility.state,
                                                     'offers' : selected_facility.offers.all() })
 
+        # <<<offer>>>
+        name_offer = request.GET.get('selected_offer', '')
+        offer_deleted = request.GET.get('offer_deleted', '')
+        offer_changed = request.GET.get('offer_changed', '')
+        new_offer = request.GET.get('new_offer', '')
+        if name_offer != '':
+            selected_offer = Offer.objects.get(name = name_offer)
+            offer_form = OfferChangeForm(initial={ 'name' : selected_offer.name, 'variant' : selected_offer.variant,
+                                                    'items' : selected_offer.items.all() })
+        
+        # <<<food>>>
+        name_food = request.GET.get('selected_food', '')
+        food_deleted = request.GET.get('food_deleted', '')
+        food_changed = request.GET.get('food_changed', '')
+        new_food = request.GET.get('new_food', '')
+        if name_food != '':
+            selected_food = Food.objects.get(name = name_food)
+            food_form = FoodChangeForm(initial={ 'name' : selected_food.name, 'variant' : selected_food.variant,
+                                'img' : selected_food.img, 'price' : selected_food.price, 'in_stock' : selected_food.in_stock,
+                                'weight' : selected_food.weight, 'ingredients' : selected_food.ingredients})
+        
+        # <<<drink>>>
+        name_drink = request.GET.get('selected_drink', '')
+        drink_deleted = request.GET.get('drink_deleted', '')
+        drink_changed = request.GET.get('drink_changed', '')
+        new_drink = request.GET.get('new_drink', '')
+        if name_drink != '':
+            selected_drink = Drink.objects.get(name = name_drink)
+            drink_form = DrinkChangeForm(initial={ 'name' : selected_drink.name, 'variant' : selected_drink.variant,
+                                'imt' : selected_drink.img, 'price' : selected_drink.price, 
+                                'in_stock' : selected_drink.in_stock, 'volume' : selected_drink.volume})
+
+        type_tab = request.GET.get('type', '')
+
     if request.method == 'POST':
-        facility_form = FacilityChangeForm(request.POST, instance=request.user)
+        type_tab = request.POST.get('type') 
+        if type_tab == 'facility':
+            facility_form = FacilityChangeForm(request.POST, instance=request.user)
+        elif type_tab == 'offer':
+            offer_form = OfferChangeForm(request.POST, instance=request.user)
+        elif type_tab == 'food':
+            food_form = FoodChangeForm(request.POST, instance=request.user)
+        elif type_tab == 'drink':
+            drink_form = DrinkChangeForm(request.POST, instance=request.user)
 
     #send data
     context = { 'user' : request.user,
+                'type' : type_tab,
+
+                # <<<facility>>>
                 'facilities' : Facility.objects.all(),
                 'selected_facility' : selected_facility,
                 'facility_deleted' : facility_deleted,
                 'facility_changed' : facility_changed,
                 'new_facility' : new_facility, 
-                'fac_form' : facility_form, }
+                'fac_form' : facility_form,
+
+                # <<<offer>>>
+                'offers' : Offer.objects.all(),
+                'selected_offer' : selected_offer,
+                'offer_deleted' : offer_deleted,
+                'offer_changed' : offer_changed,
+                'new_offer' : new_offer,
+                'offer_form' : offer_form,
+
+                # <<<food>>>
+                'foods' : Food.objects.all(),
+                'selected_food' : selected_food,
+                'food_deleted' : food_deleted,
+                'food_changed' : food_changed,
+                'new_food' : new_food,
+                'food_form' : food_form,
+
+                # <<<drink>>>
+                'drinks' : Drink.objects.all(),
+                'selected_drink' : selected_drink,
+                'drink_deleted' : drink_deleted,
+                'drink_changed' : drink_changed,
+                'new_drink' : new_drink,
+                'drink_form' : drink_form,
+                }
     return render(request, 'app/operator.html', context)
 
 def create_facility(request):
@@ -329,7 +426,7 @@ def edit_offer(request):
             if offer_form.is_valid():
                 code = '0'
 
-                offfer.variant = offer_form.cleaned_data.get('variant')
+                offer.variant = offer_form.cleaned_data.get('variant')
                 offer.items.set(facility_form.cleaned_data.get('items'))
                 offer.save()
             else:
@@ -352,7 +449,129 @@ def delete_offer(request):
         offer_to_delete.delete()
         code = '0'
 
-    return redirect(to = next_url + '?facility_offer=' + code)
+    return redirect(to = next_url + '?offer_deleted=' + code)
+
+def create_food(request):
+    code = '1'
+    if request.method == 'POST':
+        next_url = request.POST.get('next_url', '/')
+        new_name = request.POST.get('new_food_name')
+        new_price = request.POST.get('new_food_price')
+        new_weight = request.POST.get('new_food_weight')
+        new_ingredients = request.POST.get('new_food_ingredients')
+
+        new_food= Food(name=new_name, price=new_price, weight=new_weight, ingredients=new_ingredients, in_stock=False)        
+        try:
+            new_food.save()
+            code = '0'
+        except Exception:
+            code = '2'
+
+    return redirect(to = next_url + '?new_food=' + code)
+
+def edit_food(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name')
+
+    if name != None:
+        food = Food.objects.get(name=name)
+
+    if food != None:
+        if request.method == 'POST':
+            food_form = FoodChangeForm(request.POST, instance = request.user)
+
+            if food_form.is_valid():
+                code = '0'
+
+                food.variant = food_form.cleaned_data.get('variant')
+                food.img = food_form.cleaned_data.get('img')
+                food.price = food_form.cleaned_data.get('prince')
+                food.in_stock = food_form.cleaned_data.get('in_stock')
+                food.weight = food_form.cleaned_data.get('weight')
+                food.ingredients = food_form.cleaned_data.get('ingredients')
+                food.save()
+            else:
+                code = '1'
+        
+            # do not add '&food_changed' if it is already in url
+            s = '&food_changed'
+            if s in next_url:
+                next_url = next_url.split(s)[0]
+
+            return redirect(to = next_url + '&food_changed=' + code)
+
+def delete_food(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name', '')
+
+    code = '1'
+    if name != '':
+        offer_to_delete = Food.objects.get(name=name)
+        offer_to_delete.delete()
+        code = '0'
+
+    return redirect(to = next_url + '?food_deleted=' + code)
+
+def create_drink(request):
+    code = '1'
+    if request.method == 'POST':
+        next_url = request.POST.get('next_url', '/')
+        new_name = request.POST.get('new_drink_name')
+        new_price = request.POST.get('new_drink_price')
+        new_volume = request.POST.get('new_drink_volume')
+
+        new_drink = Drink(name=new_name, price=new_price, volume=new_volume, in_stock=False)        
+        try:
+            new_drink.save()
+            code = '0'
+        except Exception:
+            code = '2'
+
+    return redirect(to = next_url + '?new_drink=' + code)
+
+def edit_drink(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name')
+
+    if name != None:
+        drink = Drink.objects.get(name=name)
+
+    if drink != None:
+        if request.method == 'POST':
+            drink_form = DrinkChangeForm(request.POST, instance = request.user)
+
+            if drink_form.is_valid():
+                code = '0'
+
+                drink.variant = drink_form.cleaned_data.get('variant')
+                drink.img = drink_form.cleaned_data.get('img')
+                drink.price = drink_form.cleaned_data.get('prince')
+                drink.in_stock = drink_form.cleaned_data.get('in_stock')
+                drink.volume = drink_form.cleaned_data.get('volume')
+                drink.save()
+            else:
+                code = '1'
+        
+            # do not add '&drink_changed' if it is already in url
+            s = '&drink_changed'
+            if s in next_url:
+                next_url = next_url.split(s)[0]
+
+            return redirect(to = next_url + '&drink_changed=' + code)
+
+def delete_drink(request):
+    next_url = request.POST.get('next_url')
+    name = request.POST.get('name', '')
+
+    code = '1'
+    if name != '':
+        offer_to_delete = Drink.objects.get(name=name)
+        offer_to_delete.delete()
+        code = '0'
+
+    return redirect(to = next_url + '?drink_deleted=' + code)
+
+#------------------------------
 
 def driver(request):
     context = { 'orders' : Order.objects.filter(handled_by=request.user.id).order_by('-date')[::-1],
