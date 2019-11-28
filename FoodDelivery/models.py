@@ -50,19 +50,19 @@ class Order(models.Model):
         return "Order: " + str(self.pk)
 
 class OrderItem(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.SET_NULL, null=True)
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     count = models.IntegerField()
 
     def __str__(self):
-        return "Order: " + str(self.item) + " " + str(self.order)
+        return "OrderItem: " + str(self.item) + " " + str(self.order)
 
 class Offer(models.Model):
     OFFER_VARIANT = (
         ('D', 'DAILY_OFFER'),
         ('P', 'PERMANENT_OFFER')
     )
-    name = models.CharField(max_length=100, default='Default offer name')
+    name = models.CharField(max_length=100, default='Výchozí název')
     variant = models.CharField(max_length=20, choices=OFFER_VARIANT) 
     items = models.ManyToManyField(Item, blank=True)
     

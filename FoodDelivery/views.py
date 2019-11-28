@@ -120,6 +120,7 @@ def filter_offers(facility, filter_form):
                 filtered_items = offer.items.filter(name__contains=search_field)
         else:
             filtered_items = offer.items.all()
+        
         filtered_offers[offer.pk] = {'items': filtered_items, 'name': offer.name, 'variant': offer.variant}
     return filtered_offers
 
@@ -176,7 +177,13 @@ def facility_detail(request, facility_id):
         filtered_offers = filter_offers(facility, filter_form)
 
         is_open = is_fac_open(facility)
-        context = {'facility': facility, 'offers': filtered_offers, 'can_order': True, 'summary': {}, 'search_form': filter_form }
+        context = {
+            'facility': facility,
+            'offers': filtered_offers,
+            'can_order': True,
+            'summary': {},
+            'search_form': filter_form 
+        }
 
         order_summary = load_order_state(request, str(facility_id))
         if request.GET.get('add_item'):

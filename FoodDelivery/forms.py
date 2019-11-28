@@ -99,7 +99,7 @@ class OfferChangeForm(forms.ModelForm):
             self.initial['items'] = check_items
 
     variant = forms.ChoiceField(choices=[('D', 'Denní nabídka'), ('P', 'Stála nabídka')], label=_('Stav'))
-    items = forms.ModelMultipleChoiceField(queryset=Item.objects.all(), required=False, label=_('Nabídky'), 
+    items = forms.ModelMultipleChoiceField(queryset=Item.objects.all(), required=False, label=_('Pokrmy'), 
                                             widget=forms.CheckboxSelectMultiple(), )
 
     class Meta:
@@ -113,8 +113,8 @@ class FoodChangeForm(forms.ModelForm):
     class Meta:
         model = Food
         fields = {'name', 'variant', 'img', 'price', 'in_stock', 'weight', 'ingredients'}
-        labels = {'name' : _('Název'), 'variant' : _('Varianta'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
-                    'in_stock' : _('V nabídce'), 'weight' : _('Gramáž'), 'ingredients' : _('Složení')}
+        labels = {'name' : _('Název'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
+                    'in_stock' : _('Dostupnost'), 'weight' : _('Gramáž'), 'ingredients' : _('Složení')}
         widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control', 'readonly' : 'readonly'}),
                     'variant' : forms.TextInput(attrs={'class' : 'form-control'}),}
 
@@ -125,8 +125,8 @@ class DrinkChangeForm(forms.ModelForm):
     class Meta:
         model = Drink
         fields = {'name', 'variant', 'img', 'price', 'in_stock', 'volume'}
-        labels = {'name' : _('Název'), 'variant' : _('Varianta'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
-                    'in_stock' : _('V nabídce'), 'volume' : _('Volume'), }
+        labels = {'name' : _('Název'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
+                    'in_stock' : _('Dostupnost'), 'volume' : _('Objem (ml)'), }
         widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control', 'readonly' : 'readonly'}),
                     'variant' : forms.TextInput(attrs={'class' : 'form-control'}),}
 

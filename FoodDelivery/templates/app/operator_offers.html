@@ -5,7 +5,7 @@
     <form action="#" method="get">
         <p><label for="select">Výběr nabídky:</label>
         <select id="select" class="form-control" onchange="if(this.value != '0') window.location.href = '?selected_offer=' +  this.value + '&amp;type=offer';">
-            <option value="0">Nabídka</option>
+            <option value="0" selected disabled hidden>Vyberte nabídku</option>
             {% for offer in offers %}
                 <option value="{{ offer.name }}" {% if offer.name == selected_offer.name %} selected {% endif %}>{{ offer.name }}</option>
             {% endfor %}
