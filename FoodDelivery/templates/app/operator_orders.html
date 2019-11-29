@@ -1,7 +1,5 @@
 {% block orders %}
 
-<h3> Objednávky </h3>
-
     <div class="card mt-3 mx-auto">
     
         <div class="card-header">
@@ -43,6 +41,27 @@
                     </div>
                 </li>
             {% endfor %}
+
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-md-6 font-weight-bold">Vytvořil uživatel: </div>
+                    <div class="col-md-6 text-right">{{ order_data.order.created_by.username }}</div>
+                </div>
+            </li>
+
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-md-6 font-weight-bold">Provozovna:</div>
+                    <div class="col-md-6 text-right">{{ order_data.order.belongs_to.name }}</div>
+                </div>
+            </li>
+
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-md-6 font-weight-bold">Přiřazený řidič:</div>
+                    <div class="col-md-6 text-right">{{ order_data.order.handled_by.username }}</div>
+                </div>
+            </li>
 
             <li class="list-group-item">
                 <div class="row">

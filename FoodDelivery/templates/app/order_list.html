@@ -9,7 +9,11 @@
             <div class="row">
                 <div class="col-md-6 font-weight-bold">Stav objednávky:</div>
                     
-                    {% if order_data.order.state == "A" %}
+                    {% if order_data.order.state == "C" %}
+                        <div class="col-md-6 text-right font-weight-bold">Vytvořena</div>
+                    {% elif order_data.order.state == "X" %}
+                        <div class="col-md-6 text-right text-danger font-weight-bold">Zrušena</div>
+                    {% elif order_data.order.state == "A" %}
                         <div class="col-md-6 text-right text-success font-weight-bold">Přijata</div>
                     {% elif order_data.order.state == "D" %}
                         <div class="col-md-6 text-right font-weight-bold">Na cestě</div>

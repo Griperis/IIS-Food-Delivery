@@ -41,14 +41,16 @@
 
                     {# --- orders --- #}
                     <div class="tab-pane fade" id="nav-orders" role="tabpanel" aria-labelledby="nav-orders-tab">
+                        <h3> Objednávky </h3>
 
                         Filtr:
                         <form acition="{% url 'filter_order' %}" method="GET">
                             <select name="select_state" id="select_state" class="form-control">
-                                <option value="all"> --- </otpion>
-                                <option value="C"> vytvořené objednávky </option>
+                                <option value="all" {% if select_state == 'all' %} selected='selected' {% endif %}> --- </otpion>
+                                <option value="C" {% if select_state == 'C' %} selected='selected' {% endif %}> vytvořené objednávky </option>
                             </select></p>
 
+                            <input type="hidden" name="type" value="order"/>
                             <input type="submit" class="btn btn-warning mb-2" value="Potvrdit"/>
                         </form>
 

@@ -374,6 +374,7 @@ def operator(request):
                 # <<<order>>>
                 'drivers' : drivers,
                 'orders_with_data' : orders_with_data,
+                'select_state' : state,
                 }
     return render(request, 'app/operator.html', context)
 
@@ -689,7 +690,6 @@ def filter_order(request):
     state = request.GET.get('select_state')
 
     return redirect(to = next_url + '?select_state=' + state + '&type=' + type_tab)
-
 #------------------------------
 
 def driver(request):
