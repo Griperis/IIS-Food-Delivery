@@ -1,6 +1,6 @@
 {% block orders %}
 
-    <div class="card mt-3 mx-auto">
+    <div class="card pt-3 mx-auto">
     
         <div class="card-header">
             <h5 class="card-title">{{ order_data.order.belongs_to }}</h5>
@@ -98,7 +98,7 @@
                 <input type="hidden" name="state_now" value="{{ order_data.order.state }}"/>
                 <input type="hidden" name="type" value="order"/>
                 <input type="hidden" name="next_url" value="{{ request.path }}"/>
-                <input type="submit" class="btn btn-danger mt-2 ml-2" value="Potvrdit"/>
+                <input type="submit" class="btn btn-warning mt-2 ml-2" value="Potvrdit"/>
             {% endif %}
         </form>
 
