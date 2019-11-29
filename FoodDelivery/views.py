@@ -70,7 +70,7 @@ def edit_user(request):
             if request.POST.get("permissions_select") == '1':
                 user.groups.add(driver_group, operator_group, admin_group)
             if request.POST.get("permissions_select") == '2':
-                user.groups.add(driver_group, operator_group)
+                user.groups.add(operator_group)
             if request.POST.get("permissions_select") == '3':
                 user.groups.add(driver_group)
 
@@ -158,7 +158,7 @@ def create_new_order(order_state, facility_id, user):
     facility = get_object_or_404(Facility, pk=facility_id)
     order_items = order_state['order']
     price = order_state['price']
-    new_order = Order(state='A', price=price, belongs_to=facility)
+    new_order = Order(state='C', price=price, belongs_to=facility)
     if user.is_authenticated:
         new_order.created_by = user
     new_order.save()
@@ -270,6 +270,20 @@ def operator(request):
     drink_changed = '-1'
     new_drink = '-1'
 
+    # <<<orders>>>
+    state = request.GET.get('select_state', '')
+    drivers = CustomUser.objects.filter(groups__name__in=['Driver'])
+    if state == 'C':
+        orders = Order.objects.filter(state='C')
+    else:
+        orders = Order.objects.all()
+    orders_with_data = []
+    for order in orders:
+        items = OrderItem.objects.all().filter(order = order)
+        order_data = {"order" : order, "items" : items}
+        orders_with_data.append(order_data)    
+    orders_with_data.reverse()
+
     if request.method == 'GET':
         # <<<facility>>>
         id_facility = request.GET.get('selected_facility', '')
@@ -374,6 +388,11 @@ def operator(request):
                 'drink_changed' : drink_changed,
                 'new_drink' : new_drink,
                 'drink_form' : drink_form,
+
+                # <<<order>>>
+                'drivers' : drivers,
+                'orders_with_data' : orders_with_data,
+                'select_state' : state,
                 }
     return render(request, 'app/operator.html', context)
 
@@ -663,6 +682,32 @@ def delete_drink(request):
 
     return redirect(to = next_url + '?drink_deleted=' + code + '&type=' + type_tab)
 
+def accept_order(request):
+    type_tab = request.POST.get('type', '')
+    next_url = request.POST.get('next_url')
+
+    if request.method == 'POST':
+        id_driver = request.POST.get('select_driver')
+        id_order = request.POST.get('id_order')
+        state = request.POST.get('select_state')
+
+        try:
+            driver = CustomUser.objects.get(pk=id_driver)
+            order = Order.objects.get(pk=id_order)
+            order.state = state
+            order.handled_by = driver
+            order.save()
+        except Exception:
+            ...
+
+    return redirect(to = next_url + '?type=' + type_tab)
+
+def filter_order(request):
+    type_tab = request.GET.get('type', '')
+    next_url = request.GET.get('next_url')
+    state = request.GET.get('select_state')
+
+    return redirect(to = next_url + '?select_state=' + state + '&type=' + type_tab)
 #------------------------------
 
 def driver(request):

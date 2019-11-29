@@ -1,5 +1,7 @@
-{% block order_list %}
+{% block orders %}
+
     <div class="card mt-3 mx-auto">
+    
         <div class="card-header">
             <h5 class="card-title">{{ order_data.order.belongs_to }}</h5>
             <h6 class="card-subtitle text-muted">Číslo: {{ order_data.order.pk }}, Vytvořeno: {{ order_data.order.date }}</h6>
@@ -42,12 +44,55 @@
 
             <li class="list-group-item">
                 <div class="row">
+                    <div class="col-md-6 font-weight-bold">Vytvořil uživatel: </div>
+                    <div class="col-md-6 text-right">{{ order_data.order.created_by.username }}</div>
+                </div>
+            </li>
+
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-md-6 font-weight-bold">Provozovna:</div>
+                    <div class="col-md-6 text-right">{{ order_data.order.belongs_to.name }}</div>
+                </div>
+            </li>
+
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-md-6 font-weight-bold">Přiřazený řidič:</div>
+                    <div class="col-md-6 text-right">{{ order_data.order.handled_by.username }}</div>
+                </div>
+            </li>
+
+            <li class="list-group-item">
+                <div class="row">
                     <div class="col-md-6 font-weight-bold">Celkem:</div>
                     <div class="col-md-6 text-right">{{ order_data.order.price }} Kč</div>
                 </div>            
             </li>
-
         </ul>
 
+        {% if order_data.order.state == "C" %}
+            <form action="{% url 'accept_order' %}" method="POST"> {% csrf_token %}
+                <br><p>Vyberte řidiče:
+                <select name="select_driver" id="select_driver" class="form-control">
+                    {% for driver in drivers %}
+                        <option value="{{ driver.pk }}">{{ driver.username }}</option>
+                    {% endfor %}
+                </select></p>
+
+                <p>Nastavte stav objednávky:
+                <select name="select_state" id="select_state" class="form-control">
+                        <option value="A"> přijmout objednávku </option>
+                        <option value="X"> zrušit objednávku </option>
+                </select></p>
+
+                <input type="hidden" name="id_order" value="{{ order_data.order.pk }}"/>
+                <input type="hidden" name="type" value="order"/>
+                <input type="hidden" name="next_url" value="{{ request.path }}"/>
+                <input type="submit" class="btn btn-danger mb-2" value="Potvrdit"/>
+            </form>
+        {% endif %}
+
     </div>
-{% endblock %}
+
+{% endblock orders %}

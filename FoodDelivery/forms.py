@@ -116,7 +116,10 @@ class FoodChangeForm(forms.ModelForm):
         labels = {'name' : _('Název'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
                     'in_stock' : _('Dostupnost'), 'weight' : _('Gramáž'), 'ingredients' : _('Složení')}
         widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control'}),
-                    'variant' : forms.TextInput(attrs={'class' : 'form-control'}),}
+                    'variant' : forms.TextInput(attrs={'class' : 'form-control'}),
+                    'price' : forms.TextInput(attrs={'class' : 'form-control'}),
+                    'weight' : forms.TextInput(attrs={'class' : 'form-control'}),
+                    'ingredients' : forms.TextInput(attrs={'class' : 'form-control'}), }
 
     field_order = ['name', 'variant', 'img', 'in_stock', 'price' , 'weight', 'ingredients']
 
@@ -128,7 +131,10 @@ class DrinkChangeForm(forms.ModelForm):
         labels = {'name' : _('Název'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
                     'in_stock' : _('Dostupnost'), 'volume' : _('Objem (ml)'), }
         widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control'}),
-                    'variant' : forms.TextInput(attrs={'class' : 'form-control'}),}
+                    'variant' : forms.TextInput(attrs={'class' : 'form-control'}),
+                    'price' : forms.TextInput(attrs={'class' : 'form-control'}),
+                    'volume' : forms.TextInput(attrs={'class' : 'form-control'}), }
+
 
     field_order = ['name', 'variant', 'img', 'in_stock', 'price' , 'volume']
 
