@@ -15,7 +15,7 @@
 <!-- Zkontrolujte prosím nastavení kódování v hlavičce dokumentu 
      podle použitého editoru -->
 
-<h1>Název zadání (editujte)</h1> <!-- Nahradte názvem svého zadání -->
+<h1>2. Jídelna: objednávka a rozvoz jídel</h1>
 
 <dl>
 	<dt>Autoři</dt>
@@ -50,22 +50,38 @@
 <p>(Diagram případů užití není nutné vkládat, pokud IS implementuje role a případy užití definované zadáním.)</p> 
 
 <h2>Implementace</h2>
-<p>Stručná dokumentace k implementaci, která popisuje, které části projektu (např. PHP skripty) implementují jednotlivé případy použití.</p>
-<h3>Registrovaný / Neregistrovaný uživatel</h3>
+<p>Většina funkcí pro plnění html daty a práci s němi se nachází ve views.py, kde je případně pracováno i s dalšími moduly.</p>
+<!-- <p>Stručná dokumentace k implementaci, která popisuje, které části projektu (např. PHP skripty) implementují jednotlivé případy použití.</p> -->
+<h3>Neregistrovaný/Registrovaný uživatel</h3>
+<p>Uživatel aplikace se může kdykoliv přihlásit, odhlásit, zobrazit profil nebo vstoupit do jemu povolené části administrace z horní lišty.</p>
+<h4>Objednání</h4>
+<p>
+Neregistrovaný uživatel má možnost si vybrat z pokrmů v nabídce a následně dokončit objednání registrací (vyplnění minimálních údajů + hesla pro přiští použití, dále se stává strávníkem).
+Postupně přidává do "košíku" jednotlivé pokrmy, které si chce objednat (stav se ukládá do cookies) a následně může objednávku dokončit a zaslat k zpracování. Z restaurace nelze objednat,
+pokud je zavřená a nebo již nepříjmá objednávky. Některé pokrmy mohou být označené jako nedostupné a nelze je přidat do objednávky. (facility_detail.html, views.py - facility_detail())
+</p>
+<h4>Prohlížení provozoven a jejich nabídek</h4>
+<p
+>Kdokoliv vidí všechny provozovny uložené v databázi a může nimi listovat, vybrat si danou provozovnu a následně je přesměrován do detailu provozovny, 
+kde může položky pouze procházet a případně hned objednat. (index.html, views.py - index())
+</p>
 <h3>Řidič</h3>
+...
 <h3>Operátor</h3>
+...
 <h3>Administrátor</h3>
+...
 
 <h3>Databáze</h3>
 <img src="er_diagram.svg">
 
 <h2>Instalace</h2>
-
 Stručně popište: 
 <ul>
-<li>postup instalace na server,</li>
-<li>softwarové požadavky (verze PHP apod.),</li>
-<li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
+<li>Nainstalovat python v 3.7.4 a pip</li>
+<li>Pomocí pip nainstalovat moduly uvedené v requirements.txt</li>
+<li>Použít inicializační skript pro naplnění databáze a provedení počátečních migrací - db_init.sh (lokálně se vytvoří sqlite databáze, na heroku běží postgre)</li>
+<li>Zapnout server pomocí python manage.py runserver</li>
 </ul>
 
 <h2>Známé problémy</h2>
