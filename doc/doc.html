@@ -47,9 +47,8 @@
 	<tr><td>franta</td><td>franta</td><td>Zákazník</td></tr>
 </table>
 
-<p>(Diagram případů užití není nutné vkládat, pokud IS implementuje role a případy užití definované zadáním.)</p> 
-
 <h2>Implementace</h2>
+<p>Pro implementaci jsme použili framework Django.</p>
 <p>Většina funkcí pro plnění html daty a práci s němi se nachází ve views.py, kde je případně pracováno i s dalšími moduly.</p>
 
 <h3>Neregistrovaný/Registrovaný uživatel</h3>
@@ -58,20 +57,26 @@
 <p>
 Neregistrovaný uživatel má možnost si vybrat z pokrmů v nabídce a následně dokončit objednání registrací (vyplnění minimálních údajů + hesla pro přiští použití, dále se stává strávníkem).
 Postupně přidává do "košíku" jednotlivé pokrmy, které si chce objednat (stav se ukládá do cookies) a následně může objednávku dokončit a zaslat k zpracování. Z restaurace nelze objednat,
-pokud je zavřená a nebo již nepříjmá objednávky. Některé pokrmy mohou být označené jako nedostupné a nelze je přidat do objednávky. (facility_detail.html, views.py - facility_detail())
+pokud je zavřená a nebo již nepříjmá objednávky. Každá restaurace má nastavenou minimální cenu objednávky, pokud aktuální cena není větší, tak objednávka nelze provést. Některé pokrmy mohou být označené jako nedostupné a nelze je přidat do objednávky.
 </p>
+<p>Po vytvoření je objednávka ve stavu <b>Vytvořena</b>.</p>
+<p>(facility_detail.html, views.py - facility_detail())</p>
+
 <h4>Prohlížení provozoven a jejich nabídek</h4>
 <p>
 Kdokoliv vidí všechny provozovny uložené v databázi a může nimi listovat, vybrat si danou provozovnu a následně je přesměrován do detailu provozovny, 
-kde může položky pouze procházet a případně hned objednat. (index.html, views.py - index())
+kde může položky pouze procházet a případně hned objednat. 
 </p>
+<p>(index.html, views.py - index())</p>
 
 <h3>Přihlášený uživatel</h3>
 <p>Po přihlášení může uživatel ve svém profilu vidět všechny objednávky, které vytvořil, a jejich stav a informace.</p>
 <p>V druhé části profilu vidí uživatel svoje informace předvyplněné ve formuláři a může je měnit. Může zde také změnit svoje heslo. Povinné údaje jsou označeny hvezdičkou u popisu formulářového pole.</p>
+<p>(order_list.html,user_info_edit.html,user_profile.html views.py - edit_user(), change_password())</p>
 
 <h3>Řidič</h3>
 <p>Řidič vidí objednávky, které jsou mu přiřazeny, a může změnit jejich stav na <b>Doručena</b>. Zobrazené objednávky může filtrovat podle data, provozovny a stavu</p>
+<p>(driver.html views.py - driver())</p>
 
 <h3>Operátor</h3>
 <p>Operátor může v odpovídající sekci spravovat provozovny, nabídky, jídla, nápoje a objednávky.</p>
@@ -85,12 +90,14 @@ kde může položky pouze procházet a případně hned objednat. (index.html, v
 <p>Po zadání jména může vytvořit novou nabídku.</p>
 
 <h4>Jídlo a nápoje</h4>
-<p>V odpovídajících sekcích může uživatel urpavovat již existující jídla a nápoje podobným stylem jako u provozev, nabídek atd... </p>
+<p>V odpovídajících sekcích může uživatel upravovat již existující jídla a nápoje podobným stylem jako u provozen, nabídek atd... </p>
 <p>Opět lze jídla a nápoje vymazat a vytvořit nové.</p>
 
 <h4>Objednávky</h4>
 <p>V sekci Objednávky vidí operátor všechny (nebo pouze neschválené) objednávky.</p>
-<p>Neschválenou objednávku může zrušit, nebo k ní přiřadit řidiče ze seznamu všech řidičů a potvrdit ji. Tím se objednávka dostane do stavu <b>Přijata</b>. </p>
+<p>Neschválenou objednávku může zrušit (stav <b>Zrušena</b>), nebo k ní přiřadit řidiče ze seznamu všech řidičů a potvrdit ji. Tím se objednávka dostane do stavu <b>Přijata</b>. </p>
+<p>Operátor také nastavuje objednávku do stavu <b>Na cestě</b>, až je připravena k vyzvednutí řidičem z restaurace.</p>
+<p>(operator.html, operator_orders.html, operator_offers.html, operator_facilities.html, operator_drinks.html, operator_foods.html views.py - create/edit/delete_facility(), create/edit/delete_offer(), create/edit/delete_food(), create/edit/delete_drink(), accept_order())</p>
 
 <h3>Administrátor</h3>
 <p>Uživatel s právy administrátora má v ktomu určené sekci možnost spravovat uživatele. Může upravovat informace a nastatovat pravomoce již existujících uživatelů, mazat uživatele a vytvářet nové uživatele.</p>
@@ -101,6 +108,7 @@ Vybraný uživatel jde také tlačítkem odstranit.
 <p>
 U hesel v této sekci (změna hesla již existujícího uživatele, a heslo nového uživatel) nejsou kontrolovány podmínky na délku atd... aby mohl administrátor nastavit nějaké jednoduché heslo, které si uživatel následně sám změní na svoje silné heslo.
 </p>
+<p>(admin.html views.py - edit_user(), admin_create_user(), admin_set_user_password())</p>
 
 <h3>Databáze</h3>
 <img src="er_diagram.svg">
@@ -113,9 +121,6 @@ Stručně popište:
 <li>Použít inicializační skript pro naplnění databáze a provedení počátečních migrací - db_init.sh (lokálně se vytvoří sqlite databáze, na heroku běží postgre)</li>
 <li>Zapnout server pomocí python manage.py runserver</li>
 </ul>
-
-<h2>Známé problémy</h2>
-<p>Zde popište, které body zadání nejsou implementovány a z jakého důvodu. Např. &bdquo;Z časových důvodů nebyla implementována správa uživatelů.&rdquo; Pomůžete tím zrychlit hodnocení, když neimplementované funkce nebudeme muset dlouze hledat.</p>
 
 </body>
 </html>
