@@ -70,7 +70,7 @@ def edit_user(request):
             if request.POST.get("permissions_select") == '1':
                 user.groups.add(driver_group, operator_group, admin_group)
             if request.POST.get("permissions_select") == '2':
-                user.groups.add(driver_group, operator_group)
+                user.groups.add(operator_group)
             if request.POST.get("permissions_select") == '3':
                 user.groups.add(driver_group)
 
@@ -158,7 +158,7 @@ def create_new_order(order_state, facility_id, user):
     facility = get_object_or_404(Facility, pk=facility_id)
     order_items = order_state['order']
     price = order_state['price']
-    new_order = Order(state='A', price=price, belongs_to=facility)
+    new_order = Order(state='C', price=price, belongs_to=facility)
     if user.is_authenticated:
         new_order.created_by = user
     new_order.save()
