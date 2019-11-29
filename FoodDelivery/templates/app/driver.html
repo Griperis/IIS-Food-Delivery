@@ -5,28 +5,46 @@
 
 {% if user.is_authenticated %}
     {% if user|has_group:'Driver' %}
-        <form action='' method='GET'>
-            {# filter by facility #}
-            <select name='filter_facility'>
-                <option {% if filter_facility == 'all' %} selected='selected' {% endif %} value='all'> --- </option>
-                {% for fac in facilities %}
-                    <option {% if filter_facility == fac.id %} selected='selected' {% endif %} value={{ fac.id }}>{{ fac.name }}</option>
-                {% endfor %}
-            </select>
+        <div class="ml-5"
+            <form action='' method='GET'>
+                <div class="row">
+                    <label for="filter_facility">Provozovna:</label>
+                    
+                    <select name='filter_facility'>
+                        <option {% if filter_facility == 'all' %} selected='selected' {% endif %} value='all'> --- </option>
+                        {% for fac in facilities %}
+                            <option {% if filter_facility == fac.id %} selected='selected' {% endif %} value={{ fac.id }}>{{ fac.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>  
 
-            {# fitler by state #}
-            <select name='filter_state'>
-                <option value='all' {% if filter_state == 'all' %} selected='selected' {% endif %}> --- </option>
-                <option value='A' {% if filter_state == 'A' %} selected='selected' {% endif %}> akceptováno </option>
-                <option value='D' {% if filter_state == 'D' %} selected='selected' {% endif %}> na cestě </option>
-                <option value='F' {% if filter_state == 'F' %} selected='selected' {% endif %}> vyřízeno </option>
-            </select>
+                {# filter by facility #}
+                <br>Provozovna:
+                <select name='filter_facility'>
+                    <option {% if filter_facility == 'all' %} selected='selected' {% endif %} value='all'> --- </option>
+                    {% for fac in facilities %}
+                        <option {% if filter_facility == fac.id %} selected='selected' {% endif %} value={{ fac.id }}>{{ fac.name }}</option>
+                    {% endfor %}
+                </select>
 
-            {# filter by date #}
-            <input type='date' name='filter_date' value={{ filter_date }} />
+                {# fitler by state #}
+                <br>Stav objednávky:
+                <select name='filter_state'>
+                    <option value='all' {% if filter_state == 'all' %} selected='selected' {% endif %}> --- </option>
+                    <option value='C' {% if filter_state == 'C' %} selected='selected' {% endif %}> vytvořena </option>
+                    <option value='X' {% if filter_state == 'X' %} selected='selected' {% endif %}> zrušena </option>
+                    <option value='A' {% if filter_state == 'A' %} selected='selected' {% endif %}> akceptována </option>
+                    <option value='D' {% if filter_state == 'D' %} selected='selected' {% endif %}> na cestě </option>
+                    <option value='F' {% if filter_state == 'F' %} selected='selected' {% endif %}> vyřízena </option>
+                </select>
 
-            <button type='submit'>Filtruj</button>
-        </form>
+                {# filter by date #}
+                <br>Datum:
+                <input type='date' name='filter_date' value={{ filter_date }} />
+
+                <button type='submit'>Filtruj</button>
+            </form>
+        </div>
 
         {% if orders %}
             <ul>
