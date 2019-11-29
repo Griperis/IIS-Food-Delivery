@@ -5,12 +5,16 @@
 
 {% if user.is_authenticated %}
     {% if user|has_group:'Driver' %}
-        <div class="ml-5"
+
+        <div class="row w-75 pt-2 mx-auto" >
+    <div class="col-sm">
+
+        <div>
             <form action='' method='GET'>
                 <div class="row">
                     <label for="filter_facility">Provozovna:</label>
-                    
-                    <select name='filter_facility'>
+        
+                    <select class="browser-default custom-select" name='filter_facility'>
                         <option {% if filter_facility == 'all' %} selected='selected' {% endif %} value='all'> --- </option>
                         {% for fac in facilities %}
                             <option {% if filter_facility == fac.id %} selected='selected' {% endif %} value={{ fac.id }}>{{ fac.name }}</option>
@@ -86,5 +90,8 @@
     Musíte se nejdřív přihlásit!<br>
     <a href="{% url 'login' %}" > přihlasit se </a><br>
 {% endif %}
+
+</div>
+</div>
 
 {% endblock %}
