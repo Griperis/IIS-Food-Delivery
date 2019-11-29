@@ -107,6 +107,9 @@ def change_password(request):
                 return redirect(to='/login')
             return redirect(to='/user?pwdsuccess=0&tab=info')
 
+
+# FACILITY DETAIL BEGIN
+
 def filter_offers(facility, request):
     is_filter = False
     if request.get('submit'):
@@ -195,14 +198,17 @@ def facility_detail(request, facility_id):
             'summary': {},
             'search_form': filter_form 
         }
-
-        order_summary = load_order_state(request, str(facility_id))
+        order_summary = {'order': {}, 'prize': 0}
+        if not request.GET.get('remove_order'):
+            order_summary = load_order_state(request, str(facility_id))
+        
         if request.GET.get('add_item'):
             added_item_id = request.GET['add_item']
             order_summary = add_order_item(request, added_item_id, str(facility_id))
         elif request.GET.get('remove_item'):
             removed_item_id = request.GET['remove_item']
             order_summary = remove_order_item(request, removed_item_id, str(facility_id))
+
 
         if len(order_summary['order']) == 0:
             context['can_order'] = False
@@ -212,10 +218,11 @@ def facility_detail(request, facility_id):
 
         context['summary'] = order_summary
         response = render(request, 'app/facility_detail.html', context)
-        if (order_summary):
+        if order_summary:
             save_order_state(response, order_summary['order'], str(facility_id))
-
         if request.GET.get('submit'):
+            if request.GET['submit'] == 'remove_order':
+                remove_order_cookies(response);
             if request.GET['submit'] == 'remove_filter':
                 remove_form_state(response)
             else:
@@ -228,7 +235,7 @@ def order_summary(request, order_id):
     order_data = {'order': order, 'items': order_items }
     return render(request, 'app/order_summary.html', { 'order_data': order_data })
 
-#------------------------------
+# FACILITY DETAIL END
 
 def operator(request):
 
