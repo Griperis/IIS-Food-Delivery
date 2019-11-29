@@ -1,7 +1,7 @@
 .fd-summary-container {
     position: sticky;
     min-height: 400px;
-    max-width: 260px;
+    max-width: 350px;
     z-index: 2000;
     top: 30%;
     float: right;
@@ -10,10 +10,27 @@
     padding: 10px;
 }
 .fd-summary-items {
-    max-height: 300px;
+    display: inline-block;
+    color:white;
     overflow-y: auto;
+    max-height: 300px;
 }
-
+.fd-o-item {
+    max-width: 300px;
+}
+.fd-s-table {
+    color: white;
+}
+.fd-total {
+    border-top: 1px solid #f9d342;
+}
+.rem-button {
+    color: white;
+    font-size: 20px;
+}
+.rem-button:hover {
+    color: #f9d342;
+}
 .fd-search {
     top: 8%;
 }

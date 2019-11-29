@@ -14,19 +14,27 @@
         <p>{{ form.last_name.label }}{{ form.last_name }}</p>
         <p>{{ form.address.label }}{{ form.address }}</p>
         <p>{{ form.phone.label }}{{ form.phone }}</p>
-        
+
         {% if user_exists %}
           <p class="font-weight-bold text-danger">Uživatel s tímto uživatelským jménem už existuje!</p>
+        {% endif %}  
+
+        {% if form.errors %}
+          {% if form.password1.errors %}
+            <p class="font-weight-bold text-danger">Špatně zadané hesla.</p>
+          {% elif form.password2.errors %}
+            <p class="font-weight-bold text-danger">Špatně zadané hesla.</p>
+          {% elif form.email.errors %}
+            <p class="font-weight-bold text-danger">Špatný formát emailové adresy.</p>
+          {% elif form.phone.errors %}
+            <p class="font-weight-bold text-danger">Špatný formát telefonního čísla.</p>
+          {% else %}
+            <p class="font-weight-bold text-danger">Zadány chybné údaje, nebo nastal jiný problém při registraci.</p>
+          {% endif %}
         {% endif %}
-        {% if form.password1.errors %}
-          <p class="font-weight-bold text-danger">Špatně zadané hesla.</p>
-        {% endif %}
-        {% if form.email.errors %}
-          <p class="font-weight-bold text-danger">Špatný formát emailové adresy.</p>
-        {% endif %}
-        {% if form.phone.errors %}
-          <p class="font-weight-bold text-danger">Špatný formát telefonního čísla.</p>
-        {% endif %}
+
+
+
         <input type="submit" class="btn btn-warning mb-2" value="Zaregistrovat se">
     </form>
   </div>

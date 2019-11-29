@@ -36,11 +36,11 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm):
         model = CustomUser
         fields = ('email', 'first_name', 'last_name', 'address', 'phone')
-        labels = {'email': _('Emailová adresa'),'first_name': _('Jméno'),'last_name': _('Příjmení'),'address': _('Adresa'),'phone': _('Telefonní číslo'),}
+        labels = {'email': _('Emailová adresa'),'first_name': _('Jméno'),'last_name': _('Příjmení'),'address': _('Adresa*'),'phone': _('Telefonní číslo'),}
         widgets = {'email': forms.TextInput(attrs={'class': 'form-control'}),
                    'first_name': forms.TextInput(attrs={'class': 'form-control'}),
                    'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-                   'address': forms.TextInput(attrs={'class': 'form-control'}),
+                   'address': forms.TextInput(attrs={'class': 'form-control', 'required':'true'}),
                    'phone': forms.TextInput(attrs={'class': 'form-control'}),}
 
 class CustomUserChangeForm(UserChangeForm):
@@ -57,11 +57,11 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = CustomUser
         fields = ('email', 'first_name', 'last_name', 'address', 'phone')
-        labels = {'email': _('Emailová adresa'),'first_name': _('Jméno'),'last_name': _('Příjmení'),'address': _('Adresa'),'phone': _('Telefonní číslo'),}
+        labels = {'email': _('Emailová adresa'),'first_name': _('Jméno'),'last_name': _('Příjmení'),'address': _('Adresa*'),'phone': _('Telefonní číslo'),}
         widgets = {'email': forms.TextInput(attrs={'class': 'form-control'}),
                    'first_name': forms.TextInput(attrs={'class': 'form-control'}),
                    'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-                   'address': forms.TextInput(attrs={'class': 'form-control'}),
+                   'address': forms.TextInput(attrs={'class': 'form-control', 'required' : 'true'}),
                    'phone': forms.TextInput(attrs={'class': 'form-control'}),}
 
 class FacilityChangeForm(forms.ModelForm):
