@@ -3,7 +3,7 @@
 
 {% block content %}
 
-<div class="row w-75    pt-2 mx-auto" >
+<div class="row w-50 pt-2 mx-auto" >
         <div class="col-sm">
 
         {% if user.is_authenticated %}
@@ -121,7 +121,7 @@
                             <form action="{% url 'driver_accept_order' %}" method="POST"> {% csrf_token %}
                                 <input type="hidden" name="order_id" value={{ order_data.order.id }} />                    
                                 <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
-                                <input type="submit" class="btn btn-danger mb-2 mt-2 ml-2" value="Doručeno"/>
+                                <input type="submit" class="btn btn-warning mb-2 mt-2 ml-2" value="Doručeno"/>
                             </form>
                         {% endif %}
                     </div>
