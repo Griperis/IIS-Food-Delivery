@@ -48,6 +48,7 @@
                             <select name="select_state" id="select_state" class="form-control">
                                 <option value="all" {% if select_state == 'all' %} selected='selected' {% endif %}> --- </otpion>
                                 <option value="C" {% if select_state == 'C' %} selected='selected' {% endif %}> vytvořené objednávky </option>
+                                <option value="A" {% if select_state == 'A' %} selected='selected' {% endif %}> přijaté objednávky  </option>
                             </select></p>
 
                             <input type="hidden" name="type" value="order"/>

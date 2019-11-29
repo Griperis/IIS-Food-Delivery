@@ -71,8 +71,8 @@
             </li>
         </ul>
 
-        {% if order_data.order.state == "C" %}
-            <form action="{% url 'accept_order' %}" method="POST"> {% csrf_token %}
+        <form action="{% url 'accept_order' %}" method="POST"> {% csrf_token %}
+            {% if order_data.order.state == "C" %}
                 <br><p>Vyberte řidiče:
                 <select name="select_driver" id="select_driver" class="form-control">
                     {% for driver in drivers %}
@@ -83,15 +83,24 @@
                 <p>Nastavte stav objednávky:
                 <select name="select_state" id="select_state" class="form-control">
                         <option value="A"> přijmout objednávku </option>
+                        <option value="D"> na cestě </option>
                         <option value="X"> zrušit objednávku </option>
                 </select></p>
+            {% elif order_data.order.state == "A" %}
+                <p class="font-weight-bold text-warning pt-4 pl-2">Nastavte stav objednávky:</p>
+                <select name="select_state" id="select_state" class="form-control">
+                        <option value="D"> na cestě </option>
+                </select>
+            {% endif %}
 
+            {% if order_data.order.state == "C" or order_data.order.state == "A" %}        
                 <input type="hidden" name="id_order" value="{{ order_data.order.pk }}"/>
+                <input type="hidden" name="state_now" value="{{ order_data.order.state }}"/>
                 <input type="hidden" name="type" value="order"/>
                 <input type="hidden" name="next_url" value="{{ request.path }}"/>
-                <input type="submit" class="btn btn-danger mb-2" value="Potvrdit"/>
-            </form>
-        {% endif %}
+                <input type="submit" class="btn btn-danger mt-2 ml-2" value="Potvrdit"/>
+            {% endif %}
+        </form>
 
     </div>
 
