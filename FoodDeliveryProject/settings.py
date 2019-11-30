@@ -148,3 +148,8 @@ MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 django_heroku.settings(locals())
 
 AUTH_USER_MODEL = 'FoodDelivery.CustomUser'
+
+DEBUG_PROPAGATE_EXCEPTIONS = True
+
+
+
