@@ -131,13 +131,13 @@ def filter_offers(facility, request):
     offers = None
     if is_filter:
         if filter_form['daily'] is not None and filter_form['perm'] is not None:
-            offers = Offer.objects.all()
+            offers = facility.offers.all()
         elif filter_form['daily'] is not None:
-            offers = Offer.objects.filter(variant='D')
+            offers = facility.offers.filter(variant='D')
         elif filter_form['perm'] is not None:
-            offers = Offer.objects.filter(variant='P')
+            offers = facility.offers.filter(variant='P')
     else:
-        offers = Offer.objects.all()
+        offers = facility.offers.all()
         filter_form['daily'] = '1'
         filter_form['perm'] = '1'
 
