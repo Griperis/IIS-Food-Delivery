@@ -73,7 +73,7 @@ class FacilityChangeForm(forms.ModelForm):
             check_offers = [offer.pk for offer in kwargs['initial']['offers']]
             self.initial['offers'] = check_offers
     
-    state = forms.ChoiceField(choices=[('A', 'Přijímá objednávky'), ('D', 'Nepřijímá objednávky')], label=_('Stav'))
+    state = forms.ChoiceField(choices=[('A', 'Přijímá objednávky'), ('D', 'Nepřijímá objednávky')], label=_('Stav'),)
     offers = forms.ModelMultipleChoiceField(queryset=Offer.objects.all(), required=False, label=_('Nabídky'), 
                                             widget=forms.CheckboxSelectMultiple(), )
 
@@ -106,7 +106,7 @@ class OfferChangeForm(forms.ModelForm):
         model = Offer
         fields = ('name', 'variant', 'items')
         labels = {'name' : _('Název'), }
-        widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control'}), }
+        widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control'}),}
 
 class FoodChangeForm(forms.ModelForm):
 

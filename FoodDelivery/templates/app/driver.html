@@ -3,95 +3,140 @@
 
 {% block content %}
 
-{% if user.is_authenticated %}
-    {% if user|has_group:'Driver' %}
+<div class="row w-50 pt-2 mx-auto" >
+        <div class="col-sm">
 
-        <div class="row w-75 pt-2 mx-auto" >
-    <div class="col-sm">
+        {% if user.is_authenticated %}
+            {% if user|has_group:'Driver' %}
 
-        <div>
-            <form action='' method='GET'>
-                <div class="row">
-                    <label for="filter_facility">Provozovna:</label>
-        
-                    <select class="browser-default custom-select" name='filter_facility'>
+            {# --- filter --- #}
+            <div>
+                <form action="{% url 'filter_driver' %}" method='GET'>
+                    {# filter by facility #}
+                    <div class="row">
+                        <label for="filter_facility">Provozovna:</label>
+                        <select class="browser-default custom-select" name='filter_facility'>
                         <option {% if filter_facility == 'all' %} selected='selected' {% endif %} value='all'> --- </option>
-                        {% for fac in facilities %}
+                            {% for fac in facilities %}
                             <option {% if filter_facility == fac.id %} selected='selected' {% endif %} value={{ fac.id }}>{{ fac.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>  
+                            {% endfor %}
+                        </select>
+                    </div>  
 
-                {# filter by facility #}
-                <br>Provozovna:
-                <select name='filter_facility'>
-                    <option {% if filter_facility == 'all' %} selected='selected' {% endif %} value='all'> --- </option>
-                    {% for fac in facilities %}
-                        <option {% if filter_facility == fac.id %} selected='selected' {% endif %} value={{ fac.id }}>{{ fac.name }}</option>
-                    {% endfor %}
-                </select>
+                    {# fitler by state #}
+                    <div class="row ">
+                        <label for="filter_state">Stav ojednávky:</label>
+                        <select class="browser-default custom-select" name='filter_state'>
+                            <option value='all' {% if filter_state == 'all' %} selected='selected' {% endif %}> --- </option>
+                            <option value='C' {% if filter_state == 'C' %} selected='selected' {% endif %}> vytvořena </option>
+                            <option value='X' {% if filter_state == 'X' %} selected='selected' {% endif %}> zrušena </option>
+                            <option value='A' {% if filter_state == 'A' %} selected='selected' {% endif %}> přijata </option>
+                            <option value='D' {% if filter_state == 'D' %} selected='selected' {% endif %}> na cestě </option>
+                            <option value='F' {% if filter_state == 'F' %} selected='selected' {% endif %}> doručena </option>
+                        </select>
+                    </div>
 
-                {# fitler by state #}
-                <br>Stav objednávky:
-                <select name='filter_state'>
-                    <option value='all' {% if filter_state == 'all' %} selected='selected' {% endif %}> --- </option>
-                    <option value='C' {% if filter_state == 'C' %} selected='selected' {% endif %}> vytvořena </option>
-                    <option value='X' {% if filter_state == 'X' %} selected='selected' {% endif %}> zrušena </option>
-                    <option value='A' {% if filter_state == 'A' %} selected='selected' {% endif %}> akceptována </option>
-                    <option value='D' {% if filter_state == 'D' %} selected='selected' {% endif %}> na cestě </option>
-                    <option value='F' {% if filter_state == 'F' %} selected='selected' {% endif %}> vyřízena </option>
-                </select>
+                    {# filter by date #}
+                    <div class="row ">
+                        <label for="filter_date">Datum:</label>
+                        <input class="form-control" type='date' name='filter_date' value={{ filter_date }} />
+                    </div>
 
-                {# filter by date #}
-                <br>Datum:
-                <input type='date' name='filter_date' value={{ filter_date }} />
+                    {# <button type='submit'>Filtruj</button> #}
+                    <input type="hidden" name="next_url" value="{{ request.path }}">
+                    <input type="submit" class="btn btn-warning mb-2 mt-2" value="Proveď">
+                </form>
+            </div>
 
-                <button type='submit'>Filtruj</button>
-            </form>
-        </div>
+            {# --- orders --- #}
+            {% if orders_with_data|length == 0 %}
+                <p class="font-weight-bold text-danger">Žádné objednávky!</p>
+            {% else %}    
+                {% for order_data in orders_with_data %}
+                    <div class="card mt-3 mx-auto">
+            
+                        <div class="card-header">
+                            <h5 class="card-title">{{ order_data.order.belongs_to }}</h5>
+                            <h6 class="card-subtitle text-muted">Číslo: {{ order_data.order.pk }}, Vytvořeno: {{ order_data.order.date }}</h6>
+                        </div>
 
-        {% if orders %}
-            <ul>
-                {% for order in orders %}
-                    <li>
-                        <h3> {{ forloop.counter }}. Objednávka<br></h3>
-                        {# {{ order.items }}<br> #}
-                        datum: {{ order.date }}<br>
-                        cena: {{ order.price }}<br>
-                        restaurce: {{ order.belongs_to }}<br>
-                        příjemce: {{ order.created_by }}<br>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 font-weight-bold">Stav objednávky:</div>
+                                    
+                                    {% if order_data.order.state == "C" %}
+                                        <div class="col-md-6 text-right font-weight-bold">Vytvořena</div>
+                                    {% elif order_data.order.state == "X" %}
+                                        <div class="col-md-6 text-right text-danger font-weight-bold">Zrušena</div>
+                                    {% elif order_data.order.state == "A" %}
+                                        <div class="col-md-6 text-right text-success font-weight-bold">Přijata</div>
+                                    {% elif order_data.order.state == "D" %}
+                                        <div class="col-md-6 text-right font-weight-bold">Na cestě</div>
+                                    {% elif order_data.order.state == "F" %}
+                                        <div class="col-md-6 text-right font-weight-bold">Doručena</div>
+                                    {% else%}
+                                        <div class="col-md-6 text-right">Neznámý</div>
+                                    {% endif %}
+                            </div>
+                        </div>
 
-                        {% if order.state == 'A' %}
-                            stav: akceptováno
-                        {% elif order.state == 'D' %}
-                            stav: na cestě
-                        {% elif order.state == 'F' %}
-                            stav: vyřízeno
-                        {% endif %}
-                        <br>
+                        <ul class="list-group list-group-flush">
+                            {% for item in order_data.items %}
+                                <li class="list-group-item">
+                                    <div class="row ">
+                                        <div class="col-sm-auto">
+                                            <img style="height: 50px;" class="rounded" src="{% if item.item.img %}{{ item.item.img.url }}{% endif %}"
+                                            onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'">
+                                        </div>
+                                        <div class="col-sm-auto px-2">{{ item.count }}x </div>
+                                        <div class="col-sm-auto px-0  font-weight-bold">{{ item.item.name }}</div>
+                                        <div class="col text-right">á {{ item.item.price }} Kč</div>
+                                    </div>
+                                </li>
+                            {% endfor %}
 
-                        {% if order.state != 'F' %}
-                            <form action="" method="POST"> {% csrf_token %}
-                                <input type="hidden" name="order_id" value={{ order.id }} />
-                                <button type="submit">Hotovo</button>
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-md-6 font-weight-bold">Vytvořil uživatel: </div>
+                                    <div class="col-md-6 text-right">{{ order_data.order.created_by.username }}</div>
+                                </div>
+                            </li>
+
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-md-6 font-weight-bold">Provozovna:</div>
+                                    <div class="col-md-6 text-right">{{ order_data.order.belongs_to.name }}</div>
+                                </div>
+                            </li>
+
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-md-6 font-weight-bold">Celkem:</div>
+                                    <div class="col-md-6 text-right">{{ order_data.order.price }} Kč</div>
+                                </div>            
+                            </li>
+                        </ul>
+
+                        {% if order_data.order.state == 'D' %}
+                            <form action="{% url 'driver_accept_order' %}" method="POST"> {% csrf_token %}
+                                <input type="hidden" name="order_id" value={{ order_data.order.id }} />                    
+                                <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
+                                <input type="submit" class="btn btn-warning mb-2 mt-2 ml-2" value="Doručeno"/>
                             </form>
                         {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Zadne objednavky.</p>
-        {% endif %}
-    {% else %}
-        Tato stránka je pouze pro řidiče!<br>
-        <a href="{% url 'index' %}" > zpět </a><br>
-    {% endif %}
-{% else %}
-    Musíte se nejdřív přihlásit!<br>
-    <a href="{% url 'login' %}" > přihlasit se </a><br>
-{% endif %}
+                    </div>
+                    {% endfor %}
+            {% endif %}
 
-</div>
+            {% else %}
+                Tato stránka je pouze pro řidiče!<br>
+                <a href="{% url 'index' %}" > zpět </a><br>
+            {% endif %}
+        {% else %}
+            Musíte se nejdřív přihlásit!<br>
+            <a href="{% url 'login' %}" > přihlasit se </a><br>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}

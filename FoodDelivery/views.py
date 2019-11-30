@@ -275,6 +275,8 @@ def operator(request):
     drivers = CustomUser.objects.filter(groups__name__in=['Driver'])
     if state == 'C':
         orders = Order.objects.filter(state='C')
+    elif state == 'A':
+        orders = Order.objects.filter(state='A')
     else:
         orders = Order.objects.all()
     orders_with_data = []
@@ -283,6 +285,8 @@ def operator(request):
         order_data = {"order" : order, "items" : items}
         orders_with_data.append(order_data)    
     orders_with_data.reverse()
+
+    print (orders_with_data)
 
     if request.method == 'GET':
         # <<<facility>>>
@@ -689,14 +693,20 @@ def accept_order(request):
     if request.method == 'POST':
         id_driver = request.POST.get('select_driver')
         id_order = request.POST.get('id_order')
+        state_now = request.POST.get('state_now')
         state = request.POST.get('select_state')
 
         try:
-            driver = CustomUser.objects.get(pk=id_driver)
-            order = Order.objects.get(pk=id_order)
-            order.state = state
-            order.handled_by = driver
-            order.save()
+            if state_now == 'C':
+                driver = CustomUser.objects.get(pk=id_driver)
+                order = Order.objects.get(pk=id_order)
+                order.state = state
+                order.handled_by = driver
+                order.save()
+            elif state_now == 'A':
+                order = Order.objects.get(pk=id_order)
+                order.state = state
+                order.save()
         except Exception:
             ...
 
@@ -711,74 +721,78 @@ def filter_order(request):
 #------------------------------
 
 def driver(request):
-    context = { 'orders' : Order.objects.filter(handled_by=request.user.id).order_by('-date')[::-1],
-                'facilities' : Facility.objects.all(),
-                'user' : request.user, 
-                'filter_state' : 'all',
-                'filter_facility' : 'all', 
-                'filter_date' : str(datetime.date.today()), }
-
-    if request.method == 'POST':
-        #get and save status of page
-        val = request.GET.get('filter_state')
-        if val != None and val != '':
-            context['filter_state'] = val
-        val = request.GET.get('filter_facility')
-        if val != None and val != '':
-            context['filter_facility'] = request.GET.get('filter_facility')
-        if val != None and val != '':
-            context['filter_date'] = request.GET.get('filter_date')
-
-        order_id = request.POST.get('order_id')
-        if order_id != None:
-            order = get_object_or_404(Order, pk=order_id)
-            order.state = 'F'
-            order.save()
-    elif request.method == 'GET':
-        #get and save status of page
-        filter_state = request.GET.get('filter_state')
-        if filter_state == None or filter_state == '':
-            filter_state = 'all'
-        context['filter_state'] = filter_state
-        filter_facility = request.GET.get('filter_facility')
-        if filter_facility == None or filter_facility == '':
-            filter_facility = 'all'
-        context['filter_facility'] = filter_facility
-        filter_date = request.GET.get('filter_date')
-        if filter_date == None or filter_date == '':
-            filter_date = str(datetime.date.today())
-        context['filter_date'] = filter_date
-        
+    orders = Order.objects.filter(handled_by=request.user.id).order_by('-date')[::-1]
+    facilities = Facility.objects.all()
+    filter_facility = request.GET.get('filter_facility', 'all')
+    filter_state = request.GET.get('filter_state', 'all')
+    filter_date = request.GET.get('filter_date', str(datetime.date.today()))
+    
+    if request.method == "GET":
         end_date = datetime.datetime.strptime(filter_date, '%Y-%m-%d') + datetime.timedelta(days=1)
+
         #use filters to show orders
         if filter_facility == 'all':
             if filter_state == 'all':
-                context['orders'] = Order.objects.filter(date__gte=filter_date,
+                orders = Order.objects.filter(date__gte=filter_date,
                                                         date__lt=end_date,
                                                         handled_by=request.user.id).order_by('-date')[::-1]
             else:
-                context['orders'] = Order.objects.filter(state=filter_state, 
+                orders = Order.objects.filter(state=filter_state, 
                                                         date__gte=filter_date,
                                                         date__lte=end_date, 
                                                         handled_by=request.user.id).order_by('-date')[::-1]
         else:
             if filter_state == 'all':
-                context['orders'] = Order.objects.filter(belongs_to=filter_facility, 
+                orders = Order.objects.filter(belongs_to=filter_facility, 
                                                         date__gte=filter_date,
                                                         date__lte=end_date, 
                                                         handled_by=request.user.id).order_by('-date')[::-1]
             else:
-                context['orders'] = Order.objects.filter(state=filter_state, 
+                orders = Order.objects.filter(state=filter_state, 
                                                         belongs_to=filter_facility,
                                                         date__gte=filter_date,
                                                         date__lte=end_date, 
                                                         handled_by=request.user.id).order_by('-date')[::-1]
+
+    orders_with_data = []
+    #for order in context['orders']:
+    for order in orders:
+        items = OrderItem.objects.all().filter(order = order)
+        order_data = {"order" : order, "items" : items}
+        orders_with_data.append(order_data)    
+    orders_with_data.reverse()
+
+    context = { 'user' : request.user, 'orders' : orders, 'facilities' : facilities, 'filter_state' : filter_state, 'filter_facility' : filter_facility,
+                'filter_date' : filter_date}
+
+    context['orders_with_data'] = orders_with_data
 
     #convert string representation of facility_id to integer representation
     if context['filter_facility'] != 'all':
         context['filter_facility'] = int(context['filter_facility'])
 
     return render(request, 'app/driver.html', context)
+
+def filter_driver(request):
+    next_url = request.GET.get('next_url', '')
+    filter_facility = request.GET.get('filter_facility', '')
+    filter_state = request.GET.get('filter_state', '')
+    filter_date = request.GET.get('filter_date', '')
+
+    return redirect(to = next_url + '?filter_facility=' + filter_facility + '&filter_state=' + filter_state + '&filter_date=' + filter_date)
+
+def driver_accept_order(request):
+    next_url = request.POST.get('next_url')
+    id_order = request.POST.get('order_id')
+
+    try:
+        order = Order.objects.get(pk=id_order)
+        order.state = 'F'
+        order.save()
+    except Exception:
+        ...
+
+    return redirect(to = next_url)
 
 def admin(request):
     users = CustomUser.objects.all()

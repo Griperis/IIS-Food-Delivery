@@ -35,6 +35,9 @@ urlpatterns = [
 
     path('accept_order/', views.accept_order, name='accept_order'),
     path('filter_order/', views.filter_order, name='filter_order'),
+
+    path('filter_driver/', views.filter_driver, name='filter_driver'),
+    path('driver_accept_order/', views.driver_accept_order, name='driver_accept_order'),
 ]
 
 # Authentication urls!

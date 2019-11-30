@@ -1,5 +1,8 @@
 {% block offers %}
-<h3>Změna údajů nabídek</h3>
+
+<div class="pt-2">
+
+    <h3>Změna údajů nabídek</h3>
 
     {# find offer #}
     <form action="#" method="get">
@@ -56,7 +59,7 @@
                     <input type="text" name="new_offer_name" class="form-control" required="" >
                 </p>
                 <p>
-                    <select name='new_variant'>
+                    <select class="form-control" name='new_variant'>
                         <option value='D'> denní nabídka </option>
                         <option value='P'> stálá nabídka </option>
                     </select>
@@ -77,4 +80,7 @@
             </form>
         </div>
     </div>
+
+</div>
+
 {% endblock offers %}
