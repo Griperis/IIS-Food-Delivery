@@ -1,9 +1,3 @@
-python manage.py makemigrations FoodDelivery;
-python manage.py migrate FoodDelivery;
-python manage.py makemigrations;
-python manage.py migrate;
-echo "
-
 from FoodDelivery.models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
 from django.utils import timezone
 from django.contrib.auth.models import Group
@@ -123,4 +117,3 @@ denni.items.add(polRajska, svickova, smazak)
 veveri.offers.add(ceska_klasika, denni, alkohol, nealko)
 cejl.offers.add(ceska_klasika, polevky, prilohy, alkohol, nealko)
 semilasso.offers.add(polevky, alkohol, nealko)
-" | python manage.py shell
