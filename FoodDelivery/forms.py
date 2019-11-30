@@ -80,7 +80,7 @@ class FacilityChangeForm(forms.ModelForm):
     class Meta:
         model = Facility
         fields = ('name', 'address', 'opening_time', 'closing_time', 'state', 'offers')
-        labels = {'name' : _('Jméno'), 'address' : _('Adresa'), 'opening_time' : _('Otevírací doba'), 
+        labels = {'name' : _('Jméno*'), 'address' : _('Adresa*'), 'opening_time' : _('Otevírací doba'), 
                     'closing_time' : _('Zavírací doba')}
         widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control'}),
                     'address' : forms.TextInput(attrs={'class' : 'form-control'}), 
@@ -98,23 +98,23 @@ class OfferChangeForm(forms.ModelForm):
             check_items = [item.pk for item in kwargs['initial']['offers']]
             self.initial['items'] = check_items
 
-    variant = forms.ChoiceField(choices=[('D', 'Denní nabídka'), ('P', 'Stála nabídka')], label=_('Stav'))
+    variant = forms.ChoiceField(choices=[('D', 'Denní nabídka'), ('P', 'Stála nabídka')], label=_('Stav*'))
     items = forms.ModelMultipleChoiceField(queryset=Item.objects.all(), required=False, label=_('Pokrmy'), 
                                             widget=forms.CheckboxSelectMultiple(), )
 
     class Meta:
         model = Offer
         fields = ('name', 'variant', 'items')
-        labels = {'name' : _('Název'), }
-        widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control'}),}
+        labels = {'name' : _('Název*'), }
+        widgets = { 'name' : forms.TextInput(attrs={'class' : 'form-control'}), }
 
 class FoodChangeForm(forms.ModelForm):
 
     class Meta:
         model = Food
         fields = {'name', 'variant', 'img', 'price', 'in_stock', 'weight', 'ingredients'}
-        labels = {'name' : _('Název'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
-                    'in_stock' : _('Dostupnost'), 'weight' : _('Gramáž'), 'ingredients' : _('Složení')}
+        labels = {'name' : _('Název*'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena*'), 
+                    'in_stock' : _('Dostupnost'), 'weight' : _('Gramáž*'), 'ingredients' : _('Složení*')}
         widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control'}),
                     'variant' : forms.TextInput(attrs={'class' : 'form-control'}),
                     'price' : forms.TextInput(attrs={'class' : 'form-control'}),
@@ -128,8 +128,8 @@ class DrinkChangeForm(forms.ModelForm):
     class Meta:
         model = Drink
         fields = {'name', 'variant', 'img', 'price', 'in_stock', 'volume'}
-        labels = {'name' : _('Název'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena'), 
-                    'in_stock' : _('Dostupnost'), 'volume' : _('Objem (ml)'), }
+        labels = {'name' : _('Název*'), 'variant' : _('Typ'), 'img' : _('Obrázek'), 'price' : _('Cena*'), 
+                    'in_stock' : _('Dostupnost'), 'volume' : _('Objem (ml)*'), }
         widgets = {'name' : forms.TextInput(attrs={'class' : 'form-control'}),
                     'variant' : forms.TextInput(attrs={'class' : 'form-control'}),
                     'price' : forms.TextInput(attrs={'class' : 'form-control'}),

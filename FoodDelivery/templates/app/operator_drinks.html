@@ -55,15 +55,15 @@
             <h3>Vytvoření nového nápoje</h3>
             <form action="{% url 'create_drink' %}" method="POST"> {% csrf_token %}
                 <p>
-                    <label for="new_drink_name">Název nápoje:</label>
+                    <label for="new_drink_name">Název nápoje*:</label>
                     <input type="text" name="new_drink_name" class="form-control" required="" >
                 </p>
                 <p>
-                    <label for="new_drink_price">Cena:</label>
+                    <label for="new_drink_price">Cena*:</label>
                     <input type="text" name="new_drink_price" class="form-control" required="" >
                 </p>
                 <p>
-                    <label for="new_drink_volume">Objem (ml):</label>
+                    <label for="new_drink_volume">Objem (ml)*:</label>
                     <input type="text" name="new_drink_volume" class="form-control" required="" >
                 </p>
                 <input type="hidden" name="next_url" value="{{ request.path }}"/>
