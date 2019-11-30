@@ -134,6 +134,8 @@ AWS_STORAGE_BUCKET_NAME = 'iis-fd'
 AWS_S3_REGION_NAME = 'eu-central-1'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME, AWS_S3_REGION_NAME) 
 
+AWS_DEFAULT_ACL = False
+
 AWS_LOCATION = 'media'
 
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
