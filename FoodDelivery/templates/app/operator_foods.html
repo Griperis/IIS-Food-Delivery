@@ -53,19 +53,19 @@
             <h3>Vytvoření nového jídla</h3>
             <form action="{% url 'create_food' %}" method="POST"> {% csrf_token %}
                 <p>
-                    <label for="new_food_name">Název jídla:</label>
+                    <label for="new_food_name">Název jídla*:</label>
                     <input type="text" name="new_food_name" class="form-control" required="" >
                 </p>
                 <p>
-                    <label for="new_food_price">Cena:</label>
+                    <label for="new_food_price">Cena*:</label>
                     <input type="text" name="new_food_price" class="form-control" required="" >
                 </p>
                 <p>
-                    <label for="new_food_weight">Gramáž:</label>
+                    <label for="new_food_weight">Gramáž*:</label>
                     <input type="text" name="new_food_weight" class="form-control" required="" >
                 </p>
                 <p>
-                    <label for="new_food_ingredients">Složení:</label>
+                    <label for="new_food_ingredients">Složení*:</label>
                     <input type="text" name="new_food_ingredients" class="form-control" required="" >
                 </p>
                 <input type="hidden" name="next_url" value="{{ request.path }}"/>

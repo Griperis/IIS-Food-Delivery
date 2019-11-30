@@ -52,10 +52,11 @@
             <h3>Vytvoření nové nabídky</h3>
             <form action="{% url 'create_offer' %}" method="POST"> {% csrf_token %}
                 <p>
-                    <label for="new_offer_name">Jméno nabídky:</label>
+                    <label for="new_offer_name">Jméno nabídky*:</label>
                     <input type="text" name="new_offer_name" class="form-control" required="" >
                 </p>
                 <p>
+                    <label for="new_offer_name">Stav*:</label>
                     <select name='new_variant'>
                         <option value='D'> denní nabídka </option>
                         <option value='P'> stálá nabídka </option>

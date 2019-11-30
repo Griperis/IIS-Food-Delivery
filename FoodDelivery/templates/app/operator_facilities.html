@@ -52,11 +52,11 @@
             <h3>Vytvoření nového zařízení</h3>
             <form action="{% url 'create_facility' %}" method="POST"> {% csrf_token %}
                 <p>
-                    <label for="new_facility_name">Jméno provozovny:</label>
+                    <label for="new_facility_name">Jméno provozovny*:</label>
                     <input type="text" name="new_facility_name" class="form-control" required="" >
                 </p>
                 <p>
-                    <label for="new_facility_address">Adresa:</label>
+                    <label for="new_facility_address">Adresa*:</label>
                     <input type="text" name="new_facility_address" class="form-control" required="" >
                 </p>
                 <input type="hidden" name="next_url" value="{{ request.path }}"/>
