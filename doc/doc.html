@@ -21,7 +21,7 @@
 	<dt>Autoři</dt>
 	<dd>Zdeněk Doležal
 	    <a href="mailto:xdolez82@stud.fit.vutbr.cz">xdolez82@stud.fit.vutbr.cz</a> -
-		Heroku, aws-s3 bucket, hlavní strana, detail provozovny 
+		Heroku, aws-s3, hlavní strana, detail provozovny 
 	</dd>
 	<dd>Marek Nesvadba
 	    <a href="mailto:xnesva06@stud.fit.vutbr.cz">xnesva06@stud.fit.vutbr.cz</a> - 
@@ -109,7 +109,8 @@ Vybraný uživatel jde také tlačítkem odstranit.
 U hesel v této sekci (změna hesla již existujícího uživatele, a heslo nového uživatel) nejsou kontrolovány podmínky na délku atd... aby mohl administrátor nastavit nějaké jednoduché heslo, které si uživatel následně sám změní na svoje silné heslo.
 </p>
 <p>(admin.html views.py - edit_user(), admin_create_user(), admin_set_user_password())</p>
-
+<h3>Ukládání obrázků</h3>
+<p>Aby bylo možné na heroku spolehlivě předkládat obrázky do HTML je nutné využít aplikace třetí strany - AWS S3. Každý nahrávaný obrázek je automaticky nahrán do "bucketu" na této službě a následně je skrz databázi předkládán odkaz na veřejnou adresu obrázku na AWS.</p>
 <h3>Databáze</h3>
 <img src="er_diagram.svg">
 
