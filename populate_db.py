@@ -1,7 +1,24 @@
+
+import os, django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "FoodDeliveryProject.settings")
+django.setup()
+
 from FoodDelivery.models import CustomUser, Facility, Offer, Order, Item, Food, Drink, OrderItem
 from django.utils import timezone
 from django.contrib.auth.models import Group
+from django.core.files import File
+from io import BytesIO
+from urllib.request import urlopen 
 import datetime
+
+
+def get_remote_image(name):
+    url = 'https://iis-fd.s3.eu-central-1.amazonaws.com/media/' + name + '.jpg'
+    response = urlopen(url)
+    io = BytesIO(response.read())
+    file = File(io)
+
+    return (name, file)
 
 dj_admin = CustomUser.objects.create_superuser('iis-admin', 'admin@jidelny.cz', 'iis-fd-pass')
 dj_admin.is_superuser=True
@@ -50,6 +67,12 @@ smazak.save()
 gulas.save()
 vkz.save()
 
+gulas.img.save(*get_remote_image('gulas'), save=True)
+svickova.img.save(*get_remote_image('svickova'), save=True)
+smazak.img.save(*get_remote_image('smazak'), save=True)
+vkz.img.save(*get_remote_image('vkz'), save=True)
+
+
 ceska_klasika = Offer(name='Česká klasika', variant='P')
 ceska_klasika.save()
 ceska_klasika.items.add(gulas, svickova, smazak, vkz)
@@ -59,6 +82,9 @@ brambory = Food(name='Vařené brambory', price=30, in_stock=True, weight=200, i
 
 hranolky.save()
 brambory.save()
+
+hranolky.img.save(*get_remote_image('hranolky'), save=True)
+brambory.img.save(*get_remote_image('brambory'), save=True)
 
 prilohy = Offer(name='Přílohy', variant='P')
 prilohy.save()
@@ -73,6 +99,12 @@ polRajska.save()
 polKureci.save()
 polCesnekova.save()
 polHoubova.save()
+
+polRajska.img.save(*get_remote_image('pol_raj'), save=True)
+polKureci.img.save(*get_remote_image('pol_kur'), save=True)
+polCesnekova.img.save(*get_remote_image('pol_ces'), save=True)
+polHoubova.img.save(*get_remote_image('pol_hub'), save=True)
+
 
 polevky = Offer(name='Polévky', variant='P')
 polevky.save()
@@ -99,6 +131,16 @@ kofola_mala.save()
 kofola_velka.save()
 dzus_jah.save()
 dzus_pom.save()
+
+radegast10_male.img.save(*get_remote_image('radegast'), save=True)
+radegast10_velke.img.save(*get_remote_image('radegast'), save=True)
+plzen12_male.img.save(*get_remote_image('plzen'), save=True)
+plzen12_velke.img.save(*get_remote_image('plzen'), save=True)
+kofola_mala.img.save(*get_remote_image('kofola'), save=True)
+kofola_velka.img.save(*get_remote_image('kofola'), save=True)
+dzus_jah.img.save(*get_remote_image('dzus_jah'), save=True)
+dzus_pom.img.save(*get_remote_image('dzus_pom'), save=True)
+
 
 alkohol = Offer(name='Pivo', variant='P')
 alkohol.save()

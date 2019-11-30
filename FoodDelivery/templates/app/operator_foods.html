@@ -30,7 +30,8 @@
 
     {# edit food #}
     <div class="pt-2">
-        <form action="{% url 'edit_food' %}" method="POST"> {% csrf_token %}
+        <form action="{% url 'edit_food' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
             {{ food_form.as_p }}
 
             {% if food_changed == '0' %}

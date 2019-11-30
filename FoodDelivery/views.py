@@ -571,13 +571,13 @@ def edit_food(request):
 
     if food != None:
         if request.method == 'POST':
-            food_form = FoodChangeForm(request.POST, instance = request.user)
+            food_form = FoodChangeForm(request.POST, request.FILES, instance = request.user)
 
             if food_form.is_valid():
                 code = '0'
 
                 food.variant = food_form.cleaned_data.get('variant')
-                food.img = food_form.cleaned_data.get('img')
+                food.img = request.FILES.get('img')
                 food.price = food_form.cleaned_data.get('price')
                 food.in_stock = food_form.cleaned_data.get('in_stock')
                 food.weight = food_form.cleaned_data.get('weight')
@@ -645,13 +645,13 @@ def edit_drink(request):
 
     if drink != None:
         if request.method == 'POST':
-            drink_form = DrinkChangeForm(request.POST, instance = request.user)
+            drink_form = DrinkChangeForm(request.POST, request.FILES, instance = request.user)
 
             if drink_form.is_valid():
                 code = '0'
 
                 drink.variant = drink_form.cleaned_data.get('variant')
-                drink.img = drink_form.cleaned_data.get('img')
+                drink.img = request.FILES.get('img')
                 drink.price = drink_form.cleaned_data.get('price')
                 drink.in_stock = drink_form.cleaned_data.get('in_stock')
                 drink.volume = drink_form.cleaned_data.get('volume')
