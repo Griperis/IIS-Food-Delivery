@@ -339,7 +339,7 @@ def operator(request):
             try:
                 selected_drink = Drink.objects.get(pk=id_drink)
                 drink_form = DrinkChangeForm(initial={ 'name' : selected_drink.name, 'variant' : selected_drink.variant,
-                                    'imt' : selected_drink.img, 'price' : selected_drink.price, 
+                                    'img' : selected_drink.img, 'price' : selected_drink.price, 
                                     'in_stock' : selected_drink.in_stock, 'volume' : selected_drink.volume})
             except Exception:
                 ...
