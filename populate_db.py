@@ -20,7 +20,7 @@ def get_remote_image(name):
 
     return (name, file)
 
-dj_admin = CustomUser.objects.create_superuser('iis-admin', 'admin@jidelny.cz', 'iis-fd-pass')
+dj_admin = CustomUser.objects.create_superuser('iis-admin', 'iisadmin@jidelny.cz', 'iis-fd-pass')
 dj_admin.is_superuser=True
 dj_admin.is_staff=True
 dj_admin.save()
@@ -33,10 +33,14 @@ admin_g = Group(name='Administrator')
 admin_g.save()
 dj_admin.groups.add(driver_g, operators_g, admin_g)
 
+
+admin = CustomUser.objects.create_user('admin', 'admin@jidelny.cz', 'admin', address='Skácelova 28, 602 00') 
+admin.save()
+admin.groups.add(admin_g,operators_g,driver_g)
+
 operator = CustomUser.objects.create_user('operator', 'operator@jidelny.cz', 'operator', address='Slatinská 15, 604 72') 
 operator.save()
 operator.groups.add(operators_g)
-
 
 ridic = CustomUser.objects.create_user('ridic', 'ridic@jidelny.cz', 'ridic', address='Purkyňova 72, 602 00')
 ridic.save()
