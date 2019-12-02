@@ -44,3 +44,7 @@
 .offline-symbol {
     color: red;
 }
+
+.fd-img{
+    max-width: 280px;
+}

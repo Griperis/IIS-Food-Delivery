@@ -101,7 +101,7 @@
             {% for item in offer.items %}
                 <div class="shadow m-2 p-2 fd-o-item">
                 {% comment %} Image with no image available picture when item.img is not set {% endcomment %}
-                <img style="height: 200px;" class="rounded" src="{% if item.img %}{{ item.img.url }}{% endif %}"
+                <img style="height: 200px;" class="rounded fd-img" src="{% if item.img %}{{ item.img.url }}{% endif %}"
                     onerror="this.onerror=null; this.src='/static/imgs/Default.jpg'">
                 <div class="mt-2">
                     <h4>{{ item.name }}</h4>
