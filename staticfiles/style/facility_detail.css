@@ -1,0 +1,50 @@
+.fd-summary-container {
+    position: sticky;
+    min-height: 400px;
+    max-width: 350px;
+    z-index: 2000;
+    top: 30%;
+    float: right;
+    background: #292826;
+    color: white;
+    padding: 10px;
+}
+.fd-summary-items {
+    display: inline-block;
+    color:white;
+    overflow-y: auto;
+    max-height: 300px;
+}
+.fd-o-item {
+    max-width: 300px;
+}
+.fd-s-table {
+    color: white;
+}
+.fd-total {
+    border-top: 1px solid #f9d342;
+}
+.rem-button {
+    color: white;
+    font-size: 20px;
+}
+.rem-button:hover {
+    color: #f9d342;
+}
+.fd-search {
+    top: 8%;
+}
+.fd-offer-container {
+    margin-top: 30px;
+}
+.online-symbol {
+    color: #7CFC00;
+}
+
+.offline-symbol {
+    color: red;
+}
+
+.fd-img{
+    max-width: 280px;
+}

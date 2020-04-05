@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Projekt IIS</title>
+    <style type="text/css">
+    	table { border-collapse: collapse; }
+    	td, th { border: 1px solid black; padding: 0.3em 0.5em; text-align: left; }
+    	dt { font-weight: bold; margin-top: 0.5em; }
+    </style>
+</head>
+<body>
+
+<!-- Zkontrolujte prosím nastavení kódování v hlavičce dokumentu 
+     podle použitého editoru -->
+
+<h1>2. Jídelna: objednávka a rozvoz jídel</h1>
+
+<dl>
+	<dt>Autoři</dt>
+	<dd>Zdeněk Doležal
+	    <a href="mailto:xdolez82@stud.fit.vutbr.cz">xdolez82@stud.fit.vutbr.cz</a> -
+		Heroku, aws-s3, hlavní strana, detail provozovny 
+	</dd>
+	<dd>Marek Nesvadba
+	    <a href="mailto:xnesva06@stud.fit.vutbr.cz">xnesva06@stud.fit.vutbr.cz</a> - 
+		Uživatelský profil, administrátor, registrace a autentizace uživatele
+	</dd>
+  <dd>David Mikšaník
+	    <a href="mailto:xmiksa05@stud.fit.vutbr.cz">xmiksa05@stud.fit.vutbr.cz</a> - 
+		Řidič, operátor
+	</dd>
+	<dd>Společná část - volba technologií, návrh modelu databáze, analýza případů užití, návrh uživatelského rozhraní</dd>
+	<dt>URL aplikace</dt>
+	<dd><a href="https://iis-food-delivery.herokuapp.com/">https://iis-food-delivery.herokuapp.com/</a></dd>
+	<dd>(první spuštění trvá o chvíli déle, než se nastartuje dyno na heroku)</dd>
+</dl>
+
+<h2>Uživatelé systému pro testování</h2>
+<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
+<table>
+	<tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
+	<tr><td>admin</td><td>admin</td><td>Administrátor</td></tr>
+	<tr><td>operator</td><td>operator</td><td>Operátor</td></tr>
+	<tr><td>ridic</td><td>ridic</td><td>Řidič</td></tr>
+	<tr><td>franta</td><td>franta</td><td>Zákazník</td></tr>
+</table>
+
+<h2>Implementace</h2>
+<p>Pro implementaci jsme použili framework Django.</p>
+<p>Většina funkcí pro plnění html daty a práci s němi se nachází ve views.py, kde je případně pracováno i s dalšími moduly.</p>
+
+<h3>Neregistrovaný/Registrovaný uživatel</h3>
+<p>Uživatel aplikace se může kdykoliv přihlásit, odhlásit, zobrazit profil nebo vstoupit do jemu povolené části administrace z horní lišty.</p>
+<h3>Objednání</h3>
+<p>
+Neregistrovaný uživatel má možnost si vybrat z pokrmů v nabídce a následně dokončit objednání registrací (vyplnění minimálních údajů + hesla pro přiští použití, dále se stává strávníkem).
+Postupně přidává do "košíku" jednotlivé pokrmy, které si chce objednat (stav se ukládá do cookies) a následně může objednávku dokončit a zaslat k zpracování. Z restaurace nelze objednat,
+pokud je zavřená a nebo již nepříjmá objednávky. Každá restaurace má nastavenou minimální cenu objednávky, pokud aktuální cena není větší, tak objednávka nelze provést. Některé pokrmy mohou být označené jako nedostupné a nelze je přidat do objednávky.
+</p>
+<p>Po vytvoření je objednávka ve stavu <b>Vytvořena</b>.</p>
+<p>(facility_detail.html, views.py - facility_detail())</p>
+
+<h4>Prohlížení provozoven a jejich nabídek</h4>
+<p>
+Kdokoliv vidí všechny provozovny uložené v databázi a může nimi listovat, vybrat si danou provozovnu a následně je přesměrován do detailu provozovny, 
+kde může položky pouze procházet a případně hned objednat. 
+</p>
+<p>(index.html, views.py - index())</p>
+
+<h3>Přihlášený uživatel</h3>
+<p>Po přihlášení může uživatel ve svém profilu vidět všechny objednávky, které vytvořil, a jejich stav a informace.</p>
+<p>V druhé části profilu vidí uživatel svoje informace předvyplněné ve formuláři a může je měnit. Může zde také změnit svoje heslo. Povinné údaje jsou označeny hvezdičkou u popisu formulářového pole.</p>
+<p>(order_list.html,user_info_edit.html,user_profile.html views.py - edit_user(), change_password())</p>
+
+<h3>Řidič</h3>
+<p>Řidič vidí objednávky, které jsou mu přiřazeny, a může změnit jejich stav na <b>Doručena</b>. Zobrazené objednávky může filtrovat podle data, provozovny a stavu</p>
+<p>(driver.html views.py - driver())</p>
+
+<h3>Operátor</h3>
+<p>Operátor může v odpovídající sekci spravovat provozovny, nabídky, jídla, nápoje a objednávky.</p>
+
+<h4>Provozovny</h4>
+<p>Po vybrání konkrétní provozovny se její informace, stav a nabídky automaticky vyplní do formuláře, a operátor je může měnit. Může také vybranou provozovnu smazat.</p>
+<p>Po zadání jména a adresy může operátor vytvořit novou provozovnu.</p>
+
+<h4>Nabídky</h4>
+<p>Po vybrání již existující nabídky se její informace, stav a obsažené pokrmy zobrazí ve formuláři, kde je může operátor měnit. Pokrmy, které patří do dané nabídky uživatel vybírá ze seznamu všech dostupných pokrmů (jídel a nápojů) v systému. Může také vybranou nabídku vymazat.</p>
+<p>Po zadání jména může vytvořit novou nabídku.</p>
+
+<h4>Jídlo a nápoje</h4>
+<p>V odpovídajících sekcích může uživatel upravovat již existující jídla a nápoje podobným stylem jako u provozen, nabídek atd... </p>
+<p>Opět lze jídla a nápoje vymazat a vytvořit nové.</p>
+
+<h4>Objednávky</h4>
+<p>V sekci Objednávky vidí operátor všechny (nebo pouze neschválené) objednávky.</p>
+<p>Neschválenou objednávku může zrušit (stav <b>Zrušena</b>), nebo k ní přiřadit řidiče ze seznamu všech řidičů a potvrdit ji. Tím se objednávka dostane do stavu <b>Přijata</b>. </p>
+<p>Operátor také nastavuje objednávku do stavu <b>Na cestě</b>, až je připravena k vyzvednutí řidičem z restaurace.</p>
+<p>(operator.html, operator_orders.html, operator_offers.html, operator_facilities.html, operator_drinks.html, operator_foods.html views.py - create/edit/delete_facility(), create/edit/delete_offer(), create/edit/delete_food(), create/edit/delete_drink(), accept_order())</p>
+
+<h3>Administrátor</h3>
+<p>Uživatel s právy administrátora má v ktomu určené sekci možnost spravovat uživatele. Může upravovat informace a nastatovat pravomoce již existujících uživatelů, mazat uživatele a vytvářet nové uživatele.</p>
+<p>
+Po vybrání určitého uživatele v prvku select se předvyplní uživatelovy informace do formuláře kde je může administrátor upravit. Uroveň uživatelova oprávnění je také předvyplněna do příslušného prvku select a administrátor ji může změnit.
+Vybraný uživatel jde také tlačítkem odstranit.
+<p>Nový uživatel lze vytvořit zadáním jeho uživatelského jména a hesla.</p>
+<p>
+U hesel v této sekci (změna hesla již existujícího uživatele, a heslo nového uživatel) nejsou kontrolovány podmínky na délku atd... aby mohl administrátor nastavit nějaké jednoduché heslo, které si uživatel následně sám změní na svoje silné heslo.
+</p>
+<p>(admin.html views.py - edit_user(), admin_create_user(), admin_set_user_password())</p>
+<h3>Ukládání obrázků</h3>
+<p>Aby bylo možné na heroku spolehlivě předkládat obrázky do HTML je nutné využít aplikace třetí strany - AWS S3. Každý nahrávaný obrázek je automaticky nahrán do "bucketu" na této službě a následně je skrz databázi předkládán odkaz na veřejnou adresu obrázku na AWS.</p>
+<h3>Databáze</h3>
+<img src="er_diagram.svg">
+
+<h2>Instalace</h2>
+Stručně popište: 
+<ul>
+<li>Nainstalovat python v 3.7.4 a pip</li>
+<li>Pomocí pip nainstalovat moduly uvedené v requirements.txt</li>
+<li>Použít inicializační skript pro naplnění databáze a provedení počátečních migrací - db_init.sh (lokálně se vytvoří sqlite databáze, na heroku běží postgre)</li>
+<li>Zapnout server pomocí python manage.py runserver</li>
+</ul>
+
+<h2>Známé problémy</h2>
+<p>Z důvodu problémů při přepínání do produkčního režimu aplikace neběží v produkčním režimu, ale v testovacím(debugovacím) režimu. Rozdíl je v tom, že nyní pokud nastane chyba, tak se zobrazí i informace, které by normálně uživatelé neměli vidět. Ve skutečném nasazení by se tyto problémy samozřejmě musely vyřešit a aplikace by běžela v produkčním režimu.</p>
+
+</body>
+</html>

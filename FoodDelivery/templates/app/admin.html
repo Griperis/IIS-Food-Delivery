@@ -1,0 +1,113 @@
+{% extends 'app/base.html' %}
+{% load auth_extras %}
+
+{% block content %}
+
+    <div class="row w-75 pt-2 mx-auto" >
+        <div class="col-sm">
+            <h3>Změna údajů uživatele</h3>
+            <form action="#" method="get">
+            <p><label for="select">Výběr uživatele:</label>
+            <select id="select" class="form-control" onchange="if(this.value != '0') window.location.href = '?selected=' +  this.value;">
+                <option value="0">Vyberte uživatele</option>
+                {% for user_all in users %}
+                    <option value="{{ user_all.username }}" {% if user_all.username == selected_user.username %} selected {% endif %}>{{ user_all.username }}</option>
+                {% endfor %}
+            </select></p>
+            </form>
+
+            {% if user_deleted == "1" %}
+                <p class="font-weight-bold text-success">Uživatel vymazán!</p>
+            {% elif user_deleted == "0" %}
+                <p class="font-weight-bold text-danger">Chyba při mazání uživatele!</p>
+            {% elif user_deleted == "2" %}
+                <p class="font-weight-bold text-danger">Nelze smazat přihlášeného uživatele!</p>
+            {% endif %}
+
+            <form action="{% url 'delete_user' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="username" value="{{ selected_user.username }}"/>
+                    <input type="hidden" name="next_url" value="{{ request.path }}"/>
+                    <input type="submit" class="btn btn-danger mb-2" value="Smazat uživatele">
+            </form>
+
+            <div class="pt-2">
+                <form action="{% url 'edit_user' %}" method="post">
+                    {% csrf_token %}
+                    <p>
+                        <label for="disabledInput">Uživatelské jméno:</label>
+                        <input class="form-control" id="disabledInput" type="text" placeholder="{{ selected_user.username }}" disabled>
+                    </p>
+                    {{ user_form.as_p }}
+
+                    <h4>Změna práv uživatele</h4>
+                    <p>
+                        <label for="select">Nastavení oprávnění uživatele:</label>
+                        <select id="select" name="permissions_select" class="form-control">
+                            <option value="0" {% if highest_group == None %} selected {% endif %}>Žádné</option>
+                            <option value="3" {% if highest_group != None and highest_group == "Driver" %} selected {% endif %}>Řidič</option>
+                            <option value="2" {% if highest_group != None and highest_group == "Operator" %} selected {% endif %}>Operátor</option>
+                            <option value="1" {% if highest_group != None and highest_group == "Administrator" %} selected {% endif %}>Administrátor</option>
+                        </select>
+                        {% if highest_group != None and highest_group == "Administrator" %} <small class="form-text text-muted mb-2">Práva Administrátora zahrnují i práva Operátora a řidiče </small> {% endif %}
+                    </p>
+
+                    <input type="hidden" name="selected_user" value="{{ selected_user.username }}"/>
+                    <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
+
+                    {% if set_info == "1" %}
+                        <p class="font-weight-bold text-success">Hodnoty úspěšně změněny!</p>
+                    {% elif set_info == "0" %}
+                        <p class="font-weight-bold text-danger">Hodnoty nebyly změněny, špatný formát v některém poli!</p>
+                    {% endif %}
+                    <input type="submit" class="btn btn-warning mb-2" value="Potvrdit změny">
+                </form>
+
+                <h3>Změna hesla</h3>
+                <form action="{% url 'admin_set_user_password' %}" method="post">
+                    {% csrf_token %}
+                    <p>
+                        <label for="new_user_password">Nové heslo:</label>
+                        <input type="password" name="new_user_password" class="form-control" required="" >
+                    </p>
+                    <input type="hidden" name="username" value="{{ selected_user.username }}"/>
+                    <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
+                    {% if set_password == "1" %}
+                        <p class="font-weight-bold text-success">Heslo změněno!</p>
+                    {% elif set_password == "0" %}
+                        <p class="font-weight-bold text-danger">Chyba při změně hesla!</p>
+                    {% endif %}
+                    <input type="submit" class="btn btn-warning mb-2" value="Změnit heslo">
+                </form>
+            </div>
+        </div>
+
+        <div class="col-sm">
+                <div>
+                    <h3>Vytvoření nového uživatele</h3>
+                    <form action="{% url 'admin_create_user' %}" method="post">
+                        {% csrf_token %}
+                        <p>
+                            <label for="new_user">Uživatelské jméno:</label>
+                            <input type="text" name="new_user" class="form-control" required="" >
+                        </p>
+                        <p>
+                            <label for="new_user_password">Heslo:</label>
+                            <input type="password" name="new_user_password" class="form-control" required="" >
+                        </p>
+
+                        <input type="hidden" name="next_url" value="{{ request.path }}"/>
+                        {% if new_user == "1" %}
+                            <p class="font-weight-bold text-success">Uživatel vytvořen!</p>
+                        {% elif new_user == "0" %}
+                            <p class="font-weight-bold text-danger">Chyba při vytváření uživatele!</p>
+                        {% elif new_user == "2" %}
+                            <p class="font-weight-bold text-danger">Uživatel už existuje!</p>
+                        {% endif %}
+                        <input type="submit" class="btn btn-warning mb-2" value="Vytvořit uživatele">
+                    </form>
+                </div>
+        </div>
+    </div>
+
+{% endblock %}

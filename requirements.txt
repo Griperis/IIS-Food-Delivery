@@ -1,0 +1,8 @@
+Django
+django-polymorphic
+django-storages
+django-heroku
+boto3
+gunicorn
+whitenoise
+Pillow

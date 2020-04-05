@@ -1,0 +1,82 @@
+{% block facilities %}
+
+<div class="pt-2">
+    <h3>Změna údajů provozoven</h3>
+
+    {# find facility #}
+    <form action="#" method="get">
+         <p><label for="select">Výběr provozovny:</label>
+        <select id="select" class="form-control" onchange="if(this.value != '-1') window.location.href = '?selected_facility=' +  this.value + '&amp;type=facility';">
+            <option value="-1" selected disabled hidden>Vyberte provozovnu</option>
+            {% for fac in facilities %}
+                <option value="{{ fac.pk }}" {% if fac.pk == selected_facility.pk %} selected {% endif %}>{{ fac.name }}</option>
+            {% endfor %}
+        </select></p>
+    </form>
+
+    {# delete facility #}
+    {% if facility_deleted == '0' %}
+        <p class="font-weight-bold text-success">Zařízení vymazáno!</p>
+    {% elif facility_deleted == '1' %}
+        <p class="font-weight-bold text-danger">Chyba při mazání zařízení!</p>
+    {% endif %}
+
+    <form action="{% url 'delete_facility' %}" method="POST"> {% csrf_token %}
+        <input type="hidden" name="name" value="{{ selected_facility.pk }}"/>
+        <input type="hidden" name="next_url" value="{{ request.path }}"/>
+        <input type="hidden" name="type" value="facility"/>
+        <input type="submit" class="btn btn-danger mb-2" value="Smazat provozvnu"/>
+    </form> 
+
+    {# edit facility #}
+    <div class="pt-2">
+        <form action="{% url 'edit_facility' %}" method="POST"> {% csrf_token %}
+            {{ fac_form.as_p }}
+
+            {% if facility_changed == '0' %}
+                <p class="font-weight-bold text-success">Hodnoty úspěšně změněny!</p>
+            {% elif facility_changed == '1' %}
+                <p class="font-weight-bold text-danger">Hodnoty nebyly změněny, špatný formát v některém poli!</p>
+            {% elif facility_changed == '2' %}
+                <p class="font-weight-bold text-danger">Vyberte provozvnu!</p>
+            {% endif %}
+
+            <input type="hidden" name="name" value="{{ selected_facility.pk }}"/>
+            <input type="hidden" name="next_url" value="{{ request.get_full_path }}"/>
+            <input type="hidden" name="type" value="facility"/>
+            <input type="submit" class="btn btn-warning mb-2" value="Potvrdit změny"/>
+        </form>
+    </div>
+    
+    {# create new facility #}
+    <div class="pt-2">
+        <div>
+            <h3>Vytvoření nového zařízení</h3>
+            <form action="{% url 'create_facility' %}" method="POST"> {% csrf_token %}
+                <p>
+                    <label for="new_facility_name">Jméno provozovny*:</label>
+                    <input type="text" name="new_facility_name" class="form-control" required="" >
+                </p>
+                <p>
+                    <label for="new_facility_address">Adresa*:</label>
+                    <input type="text" name="new_facility_address" class="form-control" required="" >
+                </p>
+                <input type="hidden" name="next_url" value="{{ request.path }}"/>
+                <input type="hidden" name="type" value="facility"/>
+
+                {# write out the details of operation #}
+                {% if new_facility == "0" %}
+                    <p class="font-weight-bold text-success">Zařízení vytvořeno!</p>
+                {% elif new_facility == "1" %}
+                    <p class="font-weight-bold text-danger">Chyba při vytváření zařízení!</p>
+                {% elif new_facility == "2" %}
+                    <p class="font-weight-bold text-danger">Zařízení už existuje!</p>
+                {% endif %}
+
+                <input type="submit" class="btn btn-warning mb-2" value="Vytvořit zařízení">
+           </form>
+        </div>
+    </div>
+</div>
+
+{% endblock facilities %}
